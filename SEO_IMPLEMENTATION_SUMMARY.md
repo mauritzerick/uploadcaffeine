@@ -4,7 +4,7 @@
 
 ### 1. SEO Configuration (`lib/seo.config.ts`)
 - Centralized SEO settings
-- Domain: `buymeacoffee.au`
+- Domain: `uploadcaffeine.com`
 - Australian focus (en-AU locale)
 - Author details (Mauritz Erick)
 - Default titles, descriptions, keywords
@@ -113,7 +113,7 @@ With current implementation:
 ## 🚀 Next Steps
 
 1. **Add SEO Admin Tab** (in progress)
-2. **Deploy to production** with domain `buymeacoffee.au`
+2. **Deploy to production** with domain `uploadcaffeine.com`
 3. **Submit sitemaps** to Google Search Console
 4. **Add Google Analytics** (optional)
 5. **Monitor web vitals** via `/api/seo-kpi`
@@ -190,14 +190,14 @@ Before launch:
 - [ ] Check PageSpeed Insights
 - [ ] Verify canonical URLs
 
-## 🌐 Domain Setup (buymeacoffee.au)
+## 🌐 Domain Setup (uploadcaffeine.com)
 
 1. Purchase domain at registrar
 2. Point DNS to hosting provider (Vercel)
 3. Add domain in Vercel dashboard
 4. Wait for SSL cert (automatic)
-5. Update `SITE.domain` to `https://buymeacoffee.au`
-6. Update `SITE.canonicalHost` to `buymeacoffee.au`
+5. Update `SITE.domain` to `https://uploadcaffeine.com`
+6. Update `SITE.canonicalHost` to `uploadcaffeine.com`
 7. Deploy and test
 
 ## 📈 SEO Strategy

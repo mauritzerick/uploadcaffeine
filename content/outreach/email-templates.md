@@ -3,13 +3,13 @@
 ## GitHub README Badge
 
 ```markdown
-Hey! I built a unique cyberpunk donation page for indie dev work in Australia. If you enjoy the repo, consider linking: [buymeacoffee.au](https://buymeacoffee.au) — it helps others discover it.
+Hey! I built a unique cyberpunk donation page for indie dev work in Australia. If you enjoy the repo, consider linking: [uploadcaffeine.com](https://uploadcaffeine.com) — it helps others discover it.
 ```
 
 ## Indie Hackers / Reddit
 
 ```markdown
-I made a neon, glitchy, no-perks tip jar for devs. Write-up + live demo: [buymeacoffee.au](https://buymeacoffee.au). Feedback welcome!
+I made a neon, glitchy, no-perks tip jar for devs. Write-up + live demo: [uploadcaffeine.com](https://uploadcaffeine.com). Feedback welcome!
 
 Tech stack: Next.js 14, TypeScript, Tailwind, Framer Motion, Stripe
 
@@ -34,7 +34,7 @@ Features:
 🎮 Easter eggs galore
 🇦🇺 Built for Aussie creators
 
-Check it out: buymeacoffee.au
+Check it out: uploadcaffeine.com
 
 #IndieHackers #WebDev
 ```
@@ -68,7 +68,7 @@ Excited to share my latest project: A cyberpunk-themed "buy me a coffee" platfor
 
 Would love feedback from fellow developers!
 
-👉 Live site: buymeacoffee.au
+👉 Live site: uploadcaffeine.com
 
 #WebDevelopment #IndieHackers #NextJS #Australia
 ```
@@ -78,7 +78,7 @@ Would love feedback from fellow developers!
 ```markdown
 # Building a Cyberpunk Donation Platform with Next.js 14
 
-I just launched [buymeacoffee.au](https://buymeacoffee.au), a neon-themed tip jar for indie developers. Here's how I built it and what I learned.
+I just launched [uploadcaffeine.com](https://uploadcaffeine.com), a neon-themed tip jar for indie developers. Here's how I built it and what I learned.
 
 ## Why Build Another Donation Platform?
 
@@ -95,7 +95,7 @@ Hi [Community Name],
 
 I'm Mauritz, an indie developer based in Sydney, and I just launched something I think you'll find interesting.
 
-buymeacoffee.au is a cyberpunk-themed donation platform built specifically for Australian indie developers. Think "buy me a coffee" but with personality, full technical control, and zero platform fees.
+uploadcaffeine.com is a cyberpunk-themed donation platform built specifically for Australian indie developers. Think "buy me a coffee" but with personality, full technical control, and zero platform fees.
 
 Features include:
 - Stripe integration for secure payments
@@ -108,7 +108,7 @@ I built it as both a practical tool and a learning project using Next.js 14, Typ
 
 Would love to hear your thoughts! Feel free to check it out, provide feedback, or share it with developers who might find it useful.
 
-Live site: https://buymeacoffee.au
+Live site: https://uploadcaffeine.com
 GitHub: github.com/mauritzerick
 
 Cheers,

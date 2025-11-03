@@ -6,64 +6,6 @@ import useSWR from 'swr'
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
-// Mock supporters for demo when database is empty
-const mockSupporters = [
-  {
-    id: 'mock-1',
-    name: 'Sarah Chen',
-    amountCents: 5000,
-    currency: 'usd',
-    monthly: true,
-    message: 'Love your work! Keep building amazing things 🚀',
-    createdAt: new Date(),
-  },
-  {
-    id: 'mock-2',
-    name: 'Alex Rivers',
-    amountCents: 2500,
-    currency: 'usd',
-    monthly: false,
-    message: 'This project helped me so much. Thank you!',
-    createdAt: new Date(),
-  },
-  {
-    id: 'mock-3',
-    name: 'Jordan Lee',
-    amountCents: 1500,
-    currency: 'usd',
-    monthly: false,
-    message: 'Amazing work on this! 💙',
-    createdAt: new Date(),
-  },
-  {
-    id: 'mock-4',
-    name: 'Taylor Swift',
-    amountCents: 5000,
-    currency: 'usd',
-    monthly: true,
-    message: 'Supporting innovation, one coffee at a time ☕',
-    createdAt: new Date(),
-  },
-  {
-    id: 'mock-5',
-    name: 'Morgan Blake',
-    amountCents: 1000,
-    currency: 'usd',
-    monthly: false,
-    message: 'Great stuff! Keep it up!',
-    createdAt: new Date(),
-  },
-  {
-    id: 'mock-6',
-    name: 'Casey Nova',
-    amountCents: 3000,
-    currency: 'usd',
-    monthly: false,
-    message: 'Your tutorials saved my project. Thanks! 🙏',
-    createdAt: new Date(),
-  },
-]
-
 export default function Supporters() {
   const { data, error } = useSWR('/api/stats', fetcher, {
     refreshInterval: 30000, // Refresh every 30 seconds
@@ -74,13 +16,10 @@ export default function Supporters() {
     return <SupportersSkeleton />
   }
 
-  // Use mock data if no real supporters yet, otherwise use real data
-  const supporters = data?.supporters?.recent && data.supporters.recent.length > 0 
-    ? data.supporters.recent 
-    : mockSupporters
-  
-  const totalCount = data?.supporters?.total || supporters.length
-  const isDemo = !data?.supporters?.recent || data.supporters.recent.length === 0
+  // Use real data only
+  const supporters = data?.supporters?.recent || []
+  const totalCount = data?.supporters?.total || 0
+  const hasSupport = supporters.length > 0
 
   return (
     <section id="supporters" className="relative py-20 px-4 bg-gradient-to-br from-[#0a0a14] via-[#120a1f] to-[#0a0a14] overflow-hidden">
@@ -117,16 +56,19 @@ export default function Supporters() {
             </motion.div>
           </div>
           <p className="text-xl md:text-2xl text-cyan-100 max-w-2xl mx-auto font-light">
-            <span className="text-yellow-400 font-semibold">{totalCount} legendary supporters</span> who fuel this mission
-            {isDemo && (
-              <span className="block text-sm text-cyan-400/60 mt-2">
-                (Demo data - Real supporters will appear here)
-              </span>
+            {totalCount > 0 ? (
+              <>
+                <span className="text-yellow-400 font-semibold">{totalCount} legendary supporter{totalCount !== 1 ? 's' : ''}</span> who fuel this mission
+              </>
+            ) : (
+              <>
+                <span className="text-cyan-400 font-semibold">Be the first</span> legendary supporter!
+              </>
             )}
           </p>
         </motion.div>
 
-        {supporters.length > 0 && (
+        {supporters.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {supporters.map((supporter: any, index: number) => {
               const Icon = supporter.monthly ? Trophy : Award
@@ -150,9 +92,7 @@ export default function Supporters() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   whileHover={{ scale: 1.05, y: -5 }}
-                  className={`relative bg-gradient-to-br from-gray-900 to-gray-800 p-6 rounded-2xl overflow-hidden border-2 border-cyan-500/30 ${
-                    isDemo ? 'opacity-90' : ''
-                  }`}
+                  className="relative bg-gradient-to-br from-gray-900 to-gray-800 p-6 rounded-2xl overflow-hidden border-2 border-cyan-500/30"
                   style={{ boxShadow: `0 0 30px ${glowColor}` }}
                 >
                   <div className="absolute inset-0 scanline pointer-events-none" />
@@ -224,21 +164,20 @@ export default function Supporters() {
             )
           })}
         </div>
-        )}
-
-        {/* Demo Badge */}
-        {isDemo && (
+        ) : (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center mb-8"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center py-16 mb-12"
           >
-            <div className="inline-flex items-center gap-2 bg-gray-900/50 border border-cyan-500/30 px-4 py-2 rounded-lg">
-              <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-              <span className="text-cyan-400/80 text-sm font-mono uppercase tracking-wider">
-                Demo Mode - Your real supporters will appear here automatically
-              </span>
-            </div>
+            <motion.div
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <User className="w-24 h-24 text-cyan-400/30 mx-auto mb-6" />
+            </motion.div>
+            <h3 className="text-2xl font-bold text-cyan-400 mb-4">No supporters yet</h3>
+            <p className="text-cyan-100/60 text-lg">Be the first to support this project!</p>
           </motion.div>
         )}
 
@@ -261,7 +200,7 @@ export default function Supporters() {
               <Heart className="w-6 h-6 text-white fill-current" />
             </motion.div>
             <span className="text-white font-bold text-lg uppercase tracking-wider">
-              Join {totalCount}+ Elite Supporters
+              {totalCount > 0 ? `Join ${totalCount}+ Elite Supporters` : 'Become the First Supporter'}
             </span>
             <motion.div
               animate={{ rotate: [0, 360] }}

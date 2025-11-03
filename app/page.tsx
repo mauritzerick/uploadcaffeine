@@ -17,6 +17,7 @@ import TerminalConsole from '@/components/TerminalConsole'
 import DeviceHologram from '@/components/DeviceHologram'
 import FeaturesMenu from '@/components/FeaturesMenu'
 import FlyingCoffeeMugs from '@/components/effects/FlyingCoffeeMugs'
+import QRCodeBanner from '@/components/QRCodeBanner'
 import { useFeatureFlagsContext } from '@/providers/FeatureFlagsProvider'
 import { useCoffeeMugEasterEgg } from '@/hooks/useCoffeeMugEasterEgg'
 
@@ -95,6 +96,8 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#0a0a14]">
+      {/* QR Code Banner */}
+      <QRCodeBanner />
       
       {/* Features Menu */}
       <FeaturesMenu />

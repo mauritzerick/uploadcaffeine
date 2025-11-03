@@ -18,24 +18,19 @@ export default function GoalProgress() {
     )
   }
 
-  // Use mock data if no real data, otherwise use real data
-  const hasRealData = data.supporters?.total > 0
-  
-  const mockGoal = {
-    targetCents: parseInt(process.env.NEXT_PUBLIC_MONTHLY_GOAL_CENTS || '15000'),
-    currentCents: 8500, // Demo: $85 of $150 goal (57%)
-    progressPercentage: 57,
-    oneTimeTotal: 6000, // $60
-    subscriptionTotal: 2500, // $25
-  }
-
+  // Use real data only
   const { goal } = data
-  const goalData = hasRealData ? goal : mockGoal
+  const goalData = goal || {
+    targetCents: parseInt(process.env.NEXT_PUBLIC_MONTHLY_GOAL_CENTS || '15000'),
+    currentCents: 0,
+    progressPercentage: 0,
+    oneTimeTotal: 0,
+    subscriptionTotal: 0,
+  }
   
   const currentAmount = (goalData.currentCents / 100).toFixed(2)
   const targetAmount = (goalData.targetCents / 100).toFixed(2)
   const progressPercentage = goalData.progressPercentage
-  const isDemo = !hasRealData
 
   return (
     <motion.div
@@ -70,11 +65,6 @@ export default function GoalProgress() {
             <h3 className="text-2xl md:text-3xl font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-2">
               <Zap className="w-6 h-6" />
               Monthly Goal
-              {isDemo && (
-                <span className="text-xs text-cyan-400/60 font-normal normal-case tracking-normal">
-                  (Demo)
-                </span>
-              )}
             </h3>
             <p className="text-cyan-100/70 text-sm mt-1 font-light">
               Funding hosting, coffee, and late-night coding
@@ -156,18 +146,6 @@ export default function GoalProgress() {
             </div>
           </div>
         ) : null}
-        
-        {/* Demo indicator */}
-        {isDemo && (
-          <div className="mt-4 pt-4 border-t border-cyan-500/20">
-            <div className="flex items-center gap-2 text-cyan-400/60 text-xs">
-              <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-              <span className="font-mono uppercase tracking-wider">
-                Demo Data - Real progress will update automatically
-              </span>
-            </div>
-          </div>
-        )}
       </div>
     </motion.div>
   )

@@ -1,8 +1,8 @@
 export const SITE = {
   name: 'Upload Caffeine to My System',
-  domain: 'https://buymeacoffee.au',
+  domain: 'https://uploadcaffeine.com',
   locale: 'en-AU',
-  canonicalHost: 'buymeacoffee.au',
+  canonicalHost: 'uploadcaffeine.com',
   defaultTitle: 'Support an Australian Indie Developer | Cyberpunk Buy-Me-A-Coffee',
   defaultDescription: 'Upload caffeine to my system ☕⚡ — support an indie Australian dev creating futuristic neon web experiments.',
   keywords: [

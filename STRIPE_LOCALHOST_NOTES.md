@@ -63,7 +63,7 @@ mkcert localhost
    ```
    STRIPE_SECRET_KEY=sk_live_...
    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
-   NEXT_PUBLIC_BASE_URL=https://buymeacoffee.au
+   NEXT_PUBLIC_BASE_URL=https://uploadcaffeine.com
    ```
 4. Deploy ✅ HTTPS automatic, warning gone!
 

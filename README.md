@@ -1,178 +1,327 @@
-# Buy Me a Coffee - The Best Support Platform ??
+# Buy Me a Coffee - Cyberpunk Edition ☕⚡
 
-A beautiful, modern, and fully functional "Buy Me a Coffee" website built with Next.js, TypeScript, Tailwind CSS, and Stripe integration.
+A futuristic, neon-themed donation platform built with Next.js 14, featuring stunning visual effects, AI agents, and seamless Stripe integration.
 
-## ? Features
+![Version](https://img.shields.io/badge/version-1.0.0-cyan)
+![Next.js](https://img.shields.io/badge/Next.js-14-black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)
+![Stripe](https://img.shields.io/badge/Stripe-Integrated-purple)
 
-- ?? **Beautiful Modern UI** - Gorgeous gradient designs with smooth animations
-- ? **Multiple Coffee Tiers** - Pre-set donation amounts plus custom amount option
-- ?? **Stripe Integration** - Secure payment processing
-- ?? **Fully Responsive** - Looks great on all devices
-- ? **Fast & Optimized** - Built with Next.js 14 for optimal performance
-- ?? **Smooth Animations** - Powered by Framer Motion
-- ?? **Supporters Gallery** - Showcase your amazing supporters
-- ?? **SEO Optimized** - Ready for search engines
+## 🌟 Features
 
-## ?? Getting Started
+- 🎨 **Cyberpunk UI** - Neon glows, glitch effects, and animated backgrounds
+- ⚡ **AI Agents** - Interactive agents with personality
+- 🎵 **Neon Radio** - YouTube-powered music player
+- 💳 **Stripe Payments** - Secure one-time & monthly donations in AUD
+- 🎮 **Easter Eggs** - Matrix rain, glitch mode, flying coffee mugs
+- 📊 **Goal Tracking** - Visual progress towards monthly goals
+- 🔧 **Feature Flags** - Dynamic feature management via admin panel
+- 📱 **Fully Responsive** - Beautiful on all devices
+- 🔍 **SEO Optimized** - Blog, tools, and structured data
+- 🇦🇺 **Australian Focus** - Built for Australian indie developers
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 18+ installed
-- A Stripe account (get one at [stripe.com](https://stripe.com))
+- Node.js 18+ 
+- npm or yarn
+- Stripe account (Australian business account recommended)
+- SQLite (included)
 
 ### Installation
 
-1. **Clone or navigate to the project directory:**
-   ```bash
-   cd buymeacoffee
-   ```
+1. **Clone the repository**
+```bash
+git clone https://github.com/mauritzerick/buymeacoffee.git
+cd buymeacoffee
+```
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+2. **Install dependencies**
+```bash
+npm install
+```
 
-3. **Set up environment variables:**
-   ```bash
-   cp .env.example .env.local
-   ```
-   
-   Then edit `.env.local` and add your Stripe keys:
-   ```env
-   STRIPE_SECRET_KEY=sk_test_your_secret_key_here
-   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_publishable_key_here
-   ```
+3. **Set up environment variables**
+```bash
+cp .env.example .env.local
+```
 
-4. **Run the development server:**
-   ```bash
-   npm run dev
-   ```
+Edit `.env.local` with your credentials:
+```env
+# Stripe Keys (Get from https://dashboard.stripe.com/apikeys)
+STRIPE_SECRET_KEY=sk_live_your_secret_key_here
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_your_publishable_key_here
 
-5. **Open your browser:**
-   Navigate to [http://localhost:3000](http://localhost:3000)
+# Base URL
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
-## ?? Configuration
+# Database (SQLite by default)
+DATABASE_URL="file:./dev.db"
 
-### Stripe Setup
+# Monthly Goal (in cents, e.g., 15000 = $150 AUD)
+NEXT_PUBLIC_MONTHLY_GOAL_CENTS=15000
 
-1. Sign up for a Stripe account at [stripe.com](https://stripe.com)
-2. Get your API keys from the [Stripe Dashboard](https://dashboard.stripe.com/apikeys)
-3. Add them to your `.env.local` file
-4. For testing, use Stripe's test mode keys (they start with `sk_test_` and `pk_test_`)
+# Admin Token (Choose a secure random string)
+ADMIN_TOKEN=your-secure-random-token-here
 
-### Customization
+# Stripe Webhook Secret (Get after setting up webhook)
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret_here
+```
 
-- **Edit content**: Modify the components in the `components/` directory
-- **Change colors**: Update the coffee color palette in `tailwind.config.js`
-- **Update coffee tiers**: Edit the `coffeeTiers` array in `components/CoffeeOptions.tsx`
-- **Modify supporters**: Update the `supporters` array in `components/Supporters.tsx`
+4. **Set up database**
+```bash
+npm run db:push          # Create database schema
+npm run db:seed          # Seed initial data
+npm run db:seed-flags    # Seed feature flags
+```
 
-## ?? Project Structure
+5. **Run development server**
+```bash
+npm run dev
+```
+
+Visit `http://localhost:3000` 🎉
+
+## 📁 Project Structure
 
 ```
 buymeacoffee/
-??? app/
-?   ??? api/
-?   ?   ??? create-checkout-session/  # Stripe checkout API
-?   ??? success/                       # Success page
-?   ??? cancel/                        # Cancel page
-?   ??? globals.css                    # Global styles
-?   ??? layout.tsx                     # Root layout
-?   ??? page.tsx                       # Home page
-??? components/
-?   ??? Hero.tsx                       # Hero section
-?   ??? About.tsx                      # About section
-?   ??? CoffeeOptions.tsx              # Donation options
-?   ??? Supporters.tsx                 # Supporters gallery
-?   ??? Footer.tsx                     # Footer
-??? package.json
-??? tailwind.config.js
-??? tsconfig.json
+├── app/                      # Next.js 14 App Router
+│   ├── (blog)/              # Blog pages (MDX)
+│   ├── api/                 # API routes
+│   ├── tools/              # Free SEO tools
+│   ├── success/            # Payment success page
+│   └── web-admin/          # Admin dashboard
+├── components/              # React components
+│   ├── effects/            # Visual effects
+│   └── ...                 # Core components
+├── content/                 # MDX content
+│   ├── posts/              # Blog posts (6 posts)
+│   └── outreach/           # Marketing templates
+├── lib/                     # Utility functions
+├── prisma/                  # Database
+└── middleware.ts            # Canonical URLs
 ```
 
-## ?? Customization Guide
+## 🎨 Key Components
 
-### Changing Colors
+### AI Agents
+- **Ambient Agent** - Floating motivational companion
+- **Stoic Agent** - Philosophical quotes on demand
+- **Glitch Agent** - Activate chaotic glitch effects (press 'G')
 
-Edit `tailwind.config.js` to modify the coffee color palette:
+### Visual Effects
+- **Matrix Rain** - Press 'M' three times
+- **Flying Coffee Mugs** - Click any coffee icon (90 mugs!)
+- **Glitch Mode** - Press 'G' for colorful chaos
 
-```js
-colors: {
-  coffee: {
-    // Your custom colors here
-  },
+### Features
+- **Neon Radio** - YouTube music with playlists
+- **Goal Progress** - Monthly donation tracking
+- **SEO Blog** - 6 Australian-focused blog posts
+- **Free Tools** - Neon quote generator, glitch SFX, gradient maker
+
+## 💻 Tech Stack
+
+- **Framework:** Next.js 14 (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **Animations:** Framer Motion
+- **Icons:** Lucide React
+- **Payments:** Stripe (AUD currency)
+- **Database:** SQLite with Prisma ORM
+- **Blog:** MDX (gray-matter + next-mdx-remote)
+- **SEO:** Dynamic sitemaps, OG images, JSON-LD
+- **Deployment:** Vercel (recommended)
+
+## 🔧 Configuration
+
+### Feature Flags
+
+Access `/web-admin?token=YOUR_ADMIN_TOKEN` to manage:
+- AI Agents (ambient, stoic, glitch)
+- Visual Effects (matrix rain, terminal)
+- Neon Radio settings
+- Device Hologram
+- Features Menu
+
+### Stripe Setup
+
+1. Get API keys from [Stripe Dashboard](https://dashboard.stripe.com/apikeys)
+2. Add to `.env.local`
+3. Set up webhook endpoint:
+   - URL: `https://uploadcaffeine.com/api/webhook`
+   - Events: `payment_intent.succeeded`, `payment_intent.payment_failed`
+   - Add webhook secret to `.env.local`
+
+### Database
+
+Using Prisma with SQLite:
+
+```bash
+# Push schema changes
+npm run db:push
+
+# Open Prisma Studio
+npm run db:studio
+
+# Seed data
+npm run db:seed
+npm run db:seed-flags
+```
+
+## 🎮 Easter Eggs
+
+Try these secret interactions:
+
+- **Konami Code** - ↑↑↓↓←→←→BA
+- **Matrix Mode** - Press 'M' three times quickly
+- **Glitch Effect** - Press 'G' key
+- **Flying Mugs** - Click any coffee icon ☕
+
+## 📊 Analytics
+
+Track events via `/api/track`:
+- Page views
+- Button clicks
+- Payment completions
+- Feature usage
+
+Web Vitals via `/api/seo-kpi`:
+- LCP, FID, CLS, INP
+
+## 🌐 Deployment
+
+### Vercel (Recommended)
+
+1. Push to GitHub
+2. Import project in Vercel
+3. Add environment variables
+4. Deploy!
+
+Environment variables needed:
+```
+STRIPE_SECRET_KEY
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+NEXT_PUBLIC_BASE_URL
+DATABASE_URL
+ADMIN_TOKEN
+STRIPE_WEBHOOK_SECRET
+```
+
+### Custom Domain
+
+Add `uploadcaffeine.com` in Vercel settings and update DNS.
+
+## 🔒 Security
+
+- ✅ Environment variables in `.env.local` (Git ignored)
+- ✅ Stripe webhook signature verification
+- ✅ Admin token authentication
+- ✅ HTTPS enforcement in production
+- ✅ No secrets in client code
+
+## 🎨 Customization
+
+### Colors
+
+Edit CSS variables in `app/globals.css`:
+```css
+:root {
+  --neon-cyan: #00ffff;
+  --neon-pink: #ff00ff;
+  --neon-purple: #b000ff;
 }
 ```
 
-### Adding New Coffee Tiers
+### Amounts
 
-Edit `components/CoffeeOptions.tsx`:
+Update coffee tier prices in `components/CoffeeOptions.tsx`
 
-```tsx
-const coffeeTiers = [
-  // Add your new tier here
-  {
-    id: 'tier5',
-    name: 'Premium Sponsor',
-    amount: 100,
-    emoji: '??',
-    description: 'Become a premium sponsor!',
-    icon: Crown,
-    color: 'from-purple-500 to-purple-600',
-  },
-]
+### Monthly Goal
+
+Set in `.env.local`:
+```env
+NEXT_PUBLIC_MONTHLY_GOAL_CENTS=15000  # $150 AUD
 ```
 
-### Updating Content
+### SEO Configuration
 
-- **Hero section**: `components/Hero.tsx`
-- **About section**: `components/About.tsx`
-- **Supporters**: `components/Supporters.tsx`
-- **Footer**: `components/Footer.tsx`
+Edit `lib/seo.config.ts` for site name, domain, keywords, etc.
 
-## ?? Deployment
+## 🐛 Troubleshooting
 
-### Deploy to Vercel (Recommended)
+### Payments not working
+- Check Stripe keys are correct
+- Verify webhook endpoint is configured
+- Check browser console for errors
 
-1. Push your code to GitHub
-2. Import your repository to [Vercel](https://vercel.com)
-3. Add your environment variables in Vercel's dashboard
-4. Deploy!
+### "Automatic payment filling disabled" warning
+- Normal on localhost (HTTP)
+- Disappears in production (HTTPS)
+- See `STRIPE_LOCALHOST_NOTES.md`
 
-### Other Platforms
+### Database errors
+- Run `npm run db:push`
+- Try deleting `prisma/dev.db` and re-seeding
 
-This is a standard Next.js app and can be deployed to:
-- Netlify
-- AWS Amplify
-- Railway
-- Any platform that supports Next.js
+### Build errors
+- Delete `.next` folder
+- Run `npm install` again
+- Check for TypeScript errors
 
-## ?? Security Notes
+## 📚 Documentation
 
-- Never commit your `.env.local` file
-- Use environment variables for all sensitive data
-- Use Stripe's test mode during development
-- Switch to live keys only when ready for production
+- [Next.js Docs](https://nextjs.org/docs)
+- [Stripe Docs](https://stripe.com/docs)
+- [Prisma Docs](https://www.prisma.io/docs)
+- [Tailwind CSS](https://tailwindcss.com/docs)
+- [Framer Motion](https://www.framer.com/motion)
 
-## ?? License
+**Project Docs:**
+- `SEO_IMPLEMENTATION_SUMMARY.md` - Complete SEO guide
+- `STRIPE_LOCALHOST_NOTES.md` - Stripe development guide
+- `content/outreach/` - Marketing templates
 
-This project is open source and available under the MIT License.
+## 🤝 Contributing
 
-## ?? Acknowledgments
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-- Built with [Next.js](https://nextjs.org/)
-- Styled with [Tailwind CSS](https://tailwindcss.com/)
-- Animations by [Framer Motion](https://www.framer.com/motion/)
-- Icons by [Lucide](https://lucide.dev/)
-- Payments by [Stripe](https://stripe.com/)
+## 📝 License
 
-## ?? Tips
+This project is licensed under the MIT License.
 
-- Test payments using Stripe's test card: `4242 4242 4242 4242`
-- Use any future expiry date and any CVC
-- Check Stripe Dashboard for test payments
-- Customize the design to match your brand!
+## 💖 Support
+
+If you find this project helpful:
+- ⭐ Star the repository on [GitHub](https://github.com/mauritzerick/buymeacoffee)
+- 🐛 Report bugs via Issues
+- 💡 Suggest features
+- ☕ [Buy me a coffee!](https://uploadcaffeine.com)
+
+## 🙏 Acknowledgments
+
+- Design inspired by cyberpunk aesthetics
+- Icons from [Lucide](https://lucide.dev)
+- Animations powered by [Framer Motion](https://www.framer.com/motion)
+- Payments by [Stripe](https://stripe.com)
+- Font: Inter (Google Fonts)
 
 ---
 
-Made with ? and ??
+**Built with 💜 and ☕ by [Mauritz Erick](https://github.com/mauritzerick)** 
+
+🌐 **Live Site:** [uploadcaffeine.com](https://uploadcaffeine.com)  
+💼 **LinkedIn:** [mauritzerick](https://www.linkedin.com/in/mauritzerick/)  
+📧 **Email:** mauritz.erick@gmail.com
+
+---
+
+### 🇦🇺 Proudly Australian
+
+Supporting indie developers in Australia and beyond. Upload caffeine to your favorite creators! ☕⚡

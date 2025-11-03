@@ -1,0 +1,28 @@
+{
+  "name": "Upload Caffeine to My System",
+  "short_name": "Upload Caffeine",
+  "description": "Support an Australian indie developer creating futuristic neon web experiments",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a14",
+  "theme_color": "#00ffff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-icon",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["lifestyle", "utilities"],
+  "lang": "en-AU",
+  "dir": "ltr"
+}
+
