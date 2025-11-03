@@ -1,0 +1,94 @@
+// Prisma schema for Buy Me a Coffee app
+// Database: SQLite (local-first, easy deployment)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Supporter {
+  id          String   @id @default(cuid())
+  name        String?
+  email       String?
+  amountCents Int      // Store in cents to avoid floating point issues
+  currency    String   @default("usd")
+  monthly     Boolean  @default(false)
+  message     String?
+  stripeSessionId String? @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([createdAt])
+  @@index([monthly])
+}
+
+model Event {
+  id        String   @id @default(cuid())
+  type      String   // "cta_click", "checkout_start", "checkout_success"
+  metadata  String?  // JSON string for additional data
+  createdAt DateTime @default(now())
+
+  @@index([type, createdAt])
+}
+
+model Experiment {
+  id        String   @id @default(cuid())
+  variant   String   // "headline_a" or "headline_b"
+  sessionId String
+  converted Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([variant, converted])
+}
+
+model DevQuote {
+  id        String   @id @default(cuid())
+  quote     String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+}
+
+model QuoteHistory {
+  id        String   @id @default(cuid())
+  quoteId   String
+  quote     String   // Store the actual quote for history
+  shownAt   DateTime @default(now())
+  shownDate String   // Format: YYYY-MM-DD for easy querying
+
+  @@index([shownDate])
+}
+
+model FeatureFlag {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  name        String
+  description String?
+  enabled     Boolean  @default(true)
+  intensity   String?  @default("med")
+  jsonConfig  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([key])
+  @@index([enabled])
+}
+
+model FeatureToggleAudit {
+  id        String   @id @default(cuid())
+  flagKey   String
+  oldValue  Boolean
+  newValue  Boolean
+  by        String   // "admin" or admin identifier
+  createdAt DateTime @default(now())
+
+  @@index([flagKey])
+  @@index([createdAt])
+}
+

@@ -1,0 +1,474 @@
+{
+  "project": {
+    "name": "Buy Me a Coffee - Cyberpunk Edition",
+    "version": "2.0.0",
+    "description": "A futuristic cyberpunk-themed donation platform with gamification, AI agents, and real-time features",
+    "theme": "Cyberpunk/Futuristic with neon aesthetics",
+    "tagline": "Upload caffeine to my system ☕⚡"
+  },
+  "tech_stack": {
+    "framework": "Next.js 14 (App Router)",
+    "language": "TypeScript",
+    "styling": "Tailwind CSS with custom cyberpunk theme",
+    "animations": "Framer Motion",
+    "icons": "Lucide React",
+    "database": {
+      "type": "SQLite (local-first)",
+      "orm": "Prisma",
+      "location": "prisma/dev.db"
+    },
+    "payments": "Stripe (Checkout + Webhooks)",
+    "data_fetching": "SWR (real-time updates)",
+    "state_management": "React useState + useEffect"
+  },
+  "features": {
+    "core": [
+      {
+        "name": "Frictionless Support Flow",
+        "description": "One-click coffee donation with Stripe Checkout",
+        "status": "✅ Complete"
+      },
+      {
+        "name": "Monthly Subscriptions",
+        "description": "Toggle between one-time and monthly recurring support",
+        "status": "✅ Complete"
+      },
+      {
+        "name": "Custom Amount Input",
+        "description": "Users can enter any amount or choose presets ($3, $5, $10)",
+        "status": "✅ Complete"
+      },
+      {
+        "name": "Stripe Webhooks",
+        "description": "Automatic supporter data storage on successful checkout",
+        "status": "✅ Complete"
+      },
+      {
+        "name": "Local-First Database",
+        "description": "SQLite database with Prisma ORM for easy deployment",
+        "status": "✅ Complete"
+      }
+    ],
+    "ui_components": [
+      {
+        "name": "Hero Section",
+        "description": "A/B tested headlines with emotional connection ('If I made you smile, buy me a coffee ☕')",
+        "variants": ["If I made you smile", "Did this spark joy?"],
+        "status": "✅ Complete"
+      },
+      {
+        "name": "Coffee Tier Widget",
+        "description": "Interactive tier cards ($3, $5, $10) with neon glow effects",
+        "status": "✅ Complete"
+      },
+      {
+        "name": "Goal Progress Bar",
+        "description": "Real-time monthly goal tracking with animated progress",
+        "demo_data": true,
+        "status": "✅ Complete"
+      },
+      {
+        "name": "Supporters Wall",
+        "description": "Live feed of recent supporters with names, amounts, and messages",
+        "demo_data": true,
+        "status": "✅ Complete"
+      },
+      {
+        "name": "Success Page",
+        "description": "Gratitude message with share buttons and monthly CTA",
+        "status": "✅ Complete"
+      },
+      {
+        "name": "Dev Quote of the Day",
+        "description": "Database-backed daily quotes that change at 12:00 PM AEST",
+        "total_quotes": 32,
+        "status": "✅ Complete"
+      }
+    ],
+    "gamification": [
+      {
+        "name": "Coffee Particle Burst",
+        "description": "Neon particle explosion on support button click",
+        "status": "✅ Complete"
+      },
+      {
+        "name": "Neon Tip Streak",
+        "description": "Live indicator showing recent supporter activity",
+        "status": "✅ Complete"
+      },
+      {
+        "name": "AI Thanks Message",
+        "description": "Auto-generated cyberpunk thank-you messages on success screen",
+        "examples": [
+          "🧠 Neural caffeine acquired. System efficiency +3%",
+          "⚡ Quantum coffee particles detected. Creativity matrix: OVERCLOCKED"
+        ],
+        "status": "✅ Complete"
+      },
+      {
+        "name": "Holo-Coin Spin",
+        "description": "Spinning holographic coin animation on donation success",
+        "status": "✅ Complete"
+      },
+      {
+        "name": "Achievements System",
+        "description": "Gamification badges (e.g., 'First Brew', 'VIP Supporter')",
+        "status": "✅ Complete"
+      },
+      {
+        "name": "Support Heatwave",
+        "description": "Dynamic button glow intensity based on tip amount",
+        "status": "✅ Complete"
+      },
+      {
+        "name": "Coffee Type Selector",
+        "description": "Choose brew type: Espresso, Nitro, Matcha, Cyber-Latte",
+        "status": "✅ Complete"
+      },
+      {
+        "name": "Backer Streak Badge",
+        "description": "Glowing VIP/SUPER badges for high-value or monthly supporters",
+        "status": "✅ Complete"
+      }
+    ],
+    "interactive_elements": [
+      {
+        "name": "Ambient AI Agent",
+        "description": "Draggable floating AI particle with mouse-following behavior",
+        "features": [
+          "Follows mouse cursor with smooth spring physics",
+          "Fully draggable across the screen",
+          "Tells 3 AI jokes on click, then prompts support",
+          "Auto-scrolls to support section when 'out of energy'"
+        ],
+        "status": "✅ Complete"
+      },
+      {
+        "name": "Coffee Agent",
+        "description": "Coffee-themed draggable agent with same features as AI agent",
+        "features": [
+          "Tells 3 coffee jokes on click",
+          "Same draggable and mouse-following behavior"
+        ],
+        "status": "✅ Complete"
+      },
+      {
+        "name": "Crypto-Matrix Easter Egg",
+        "description": "Hidden Matrix rain effect triggered by pressing 'M' three times or Konami code",
+        "activation": ["Press 'M' 3 times quickly", "Konami code: ↑↑↓↓←→←→BA"],
+        "status": "✅ Complete"
+      }
+    ],
+    "pages": [
+      {
+        "path": "/",
+        "name": "Home",
+        "sections": ["Hero", "Daily Quote", "Goal Progress", "Support Widget", "About", "Supporters Wall", "Footer"]
+      },
+      {
+        "path": "/success",
+        "name": "Success Page",
+        "features": ["Thank you message", "AI-generated cyberpunk message", "Holo-coin animation", "Achievement popup", "Share buttons", "Monthly CTA"]
+      },
+      {
+        "path": "/cancel",
+        "name": "Cancel Page",
+        "features": ["Friendly cancellation message", "Return home CTA"]
+      },
+      {
+        "path": "/mission",
+        "name": "Mission Terminal",
+        "features": ["Hacker-log style roadmap", "Supporter-unlocked logs"]
+      }
+    ]
+  },
+  "api_routes": [
+    {
+      "path": "/api/create-checkout-session",
+      "method": "POST",
+      "description": "Creates Stripe checkout session for one-time or monthly donations",
+      "params": ["amount (cents)", "monthly (boolean)", "name (optional)", "message (optional)", "coffeeType (optional)"]
+    },
+    {
+      "path": "/api/webhook",
+      "method": "POST",
+      "description": "Stripe webhook handler for checkout.session.completed events",
+      "security": "Stripe signature verification"
+    },
+    {
+      "path": "/api/stats",
+      "method": "GET",
+      "description": "Returns goal progress and recent supporters data",
+      "returns": ["goal (progress, target, one-time/monthly totals)", "supporters (total count, recent list)"]
+    },
+    {
+      "path": "/api/track",
+      "method": "POST",
+      "description": "Analytics event tracking endpoint",
+      "params": ["name (event name)", "payload (JSON)"]
+    },
+    {
+      "path": "/api/daily-quote",
+      "method": "GET",
+      "description": "Returns daily dev quote that changes at 12:00 PM AEST",
+      "features": ["Timezone-aware (AEST)", "Smart rotation to avoid repeats", "Quote history tracking"]
+    }
+  ],
+  "database_schema": {
+    "models": [
+      {
+        "name": "Supporter",
+        "fields": ["id", "name", "email", "amountCents", "currency", "monthly", "message", "stripeSessionId", "createdAt", "updatedAt"],
+        "description": "Stores all supporter donations and details"
+      },
+      {
+        "name": "Event",
+        "fields": ["id", "type", "metadata", "createdAt"],
+        "description": "Analytics event tracking (CTA clicks, checkouts, conversions)"
+      },
+      {
+        "name": "Experiment",
+        "fields": ["id", "variant", "sessionId", "converted", "createdAt"],
+        "description": "A/B test experiment tracking"
+      },
+      {
+        "name": "DevQuote",
+        "fields": ["id", "quote", "isActive", "createdAt", "updatedAt"],
+        "description": "Database of developer quotes (32 total)"
+      },
+      {
+        "name": "QuoteHistory",
+        "fields": ["id", "quoteId", "quote", "shownAt", "shownDate"],
+        "description": "History of which quotes were shown on which dates"
+      }
+    ]
+  },
+  "design_system": {
+    "color_palette": {
+      "primary": "#00ffff (Cyan)",
+      "secondary": "#ff00ff (Magenta/Pink)",
+      "accent": "#b000ff (Purple)",
+      "background": "#0a0a14 (Deep Black)",
+      "text": "#ffffff (White)"
+    },
+    "visual_effects": [
+      "Neon glow borders",
+      "Animated hologram grid background",
+      "Floating cyber particles",
+      "CRT scanline overlay",
+      "Glitch animations",
+      "Gradient text with glow"
+    ],
+    "animations": [
+      "Spring physics for draggable elements",
+      "Smooth scroll to sections",
+      "Particle burst effects",
+      "Pulsing glow animations",
+      "Rotating icons",
+      "Scale/hover interactions"
+    ]
+  },
+  "environment_variables": {
+    "required": [
+      {
+        "key": "DATABASE_URL",
+        "value": "file:./dev.db",
+        "description": "SQLite database path"
+      },
+      {
+        "key": "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY",
+        "value": "pk_test_...",
+        "description": "Stripe publishable key (test mode)"
+      },
+      {
+        "key": "STRIPE_SECRET_KEY",
+        "value": "sk_test_...",
+        "description": "Stripe secret key (test mode)"
+      },
+      {
+        "key": "STRIPE_WEBHOOK_SECRET",
+        "value": "whsec_...",
+        "description": "Stripe webhook signing secret"
+      },
+      {
+        "key": "NEXT_PUBLIC_BASE_URL",
+        "value": "http://localhost:3000",
+        "description": "Base URL for redirects"
+      },
+      {
+        "key": "NEXT_PUBLIC_MONTHLY_GOAL_CENTS",
+        "value": "15000",
+        "description": "Monthly goal in cents ($150)"
+      }
+    ]
+  },
+  "setup_instructions": {
+    "steps": [
+      {
+        "step": 1,
+        "command": "npm install",
+        "description": "Install all dependencies"
+      },
+      {
+        "step": 2,
+        "command": "cp .env.example .env",
+        "description": "Create .env file and add your Stripe keys"
+      },
+      {
+        "step": 3,
+        "command": "npx prisma db push",
+        "description": "Initialize database schema"
+      },
+      {
+        "step": 4,
+        "command": "npm run db:seed",
+        "description": "Seed database with dev quotes"
+      },
+      {
+        "step": 5,
+        "command": "npm run dev",
+        "description": "Start development server on http://localhost:3000"
+      },
+      {
+        "step": 6,
+        "command": "stripe listen --forward-to localhost:3000/api/webhook",
+        "description": "(Optional) Set up Stripe webhook forwarding for local testing"
+      }
+    ]
+  },
+  "deployment": {
+    "platforms": ["Vercel", "Netlify", "Railway", "Render"],
+    "checklist": [
+      "Set all environment variables",
+      "Run prisma generate in build step",
+      "Configure Stripe webhook endpoint",
+      "Test Stripe in test mode first",
+      "Enable dark mode for all pages",
+      "Test on mobile devices"
+    ]
+  },
+  "npm_scripts": {
+    "dev": "Start development server",
+    "build": "Generate Prisma client and build for production",
+    "start": "Start production server",
+    "lint": "Run ESLint",
+    "db:push": "Push Prisma schema to database",
+    "db:studio": "Open Prisma Studio (database GUI)",
+    "db:seed": "Seed database with dev quotes"
+  },
+  "key_files": {
+    "components": [
+      "components/Hero.tsx - Hero section with A/B tested headlines",
+      "components/CoffeeOptions.tsx - Support widget with tiers and custom amounts",
+      "components/GoalProgress.tsx - Real-time monthly goal tracker",
+      "components/Supporters.tsx - Live supporters wall",
+      "components/About.tsx - About section with features",
+      "components/Footer.tsx - Footer with social links and Matrix hint",
+      "components/DailyQuote.tsx - Database-backed daily quote",
+      "components/ParticleBurst.tsx - Particle burst effect",
+      "components/TipStreak.tsx - Live supporter activity indicator",
+      "components/AmbientAgent.tsx - Draggable AI/Coffee agents with jokes",
+      "components/HoloCoin.tsx - Spinning holographic coin",
+      "components/MatrixRain.tsx - Matrix rain easter egg",
+      "components/Achievement.tsx - Achievement notification popup"
+    ],
+    "api": [
+      "app/api/create-checkout-session/route.ts",
+      "app/api/webhook/route.ts",
+      "app/api/stats/route.ts",
+      "app/api/track/route.ts",
+      "app/api/daily-quote/route.ts"
+    ],
+    "pages": [
+      "app/page.tsx - Home page",
+      "app/success/page.tsx - Success page",
+      "app/cancel/page.tsx - Cancel page",
+      "app/mission/page.tsx - Mission terminal page"
+    ],
+    "config": [
+      "prisma/schema.prisma - Database schema",
+      "prisma/seed.ts - Quote seeding script",
+      "lib/prisma.ts - Prisma client singleton",
+      "lib/stripe.ts - Stripe client initialization",
+      "lib/analytics.ts - Analytics tracking helpers",
+      "app/globals.css - Cyberpunk theme styles"
+    ]
+  },
+  "future_features": {
+    "planned": [
+      "Email thank-you notifications (Resend/SendGrid)",
+      "Supporter badges and leaderboard",
+      "Multi-currency support",
+      "Admin dashboard for analytics",
+      "Public leaderboard page",
+      "Discord webhook notifications",
+      "Twitter auto-thank you bot",
+      "Referral system with rewards"
+    ]
+  },
+  "demo_features": {
+    "mock_data": {
+      "supporters": "6 demo supporters shown when database is empty",
+      "goal_progress": "Demo progress of $85/$150 (57%) when no real data"
+    },
+    "indicators": [
+      "Demo Mode badges shown when using mock data",
+      "Real data automatically replaces mock data",
+      "Webhook creates real supporter records"
+    ]
+  },
+  "analytics": {
+    "tracked_events": [
+      "page_view (with A/B variant)",
+      "cta_click (location and tier)",
+      "checkout_start (amount, monthly, coffeeType)",
+      "checkout_success",
+      "toggle_monthly",
+      "coffee_type_selected",
+      "share_click (platform)"
+    ]
+  },
+  "easter_eggs": [
+    {
+      "name": "Matrix Rain Mode",
+      "trigger": "Press 'M' three times quickly OR enter Konami code (↑↑↓↓←→←→BA)",
+      "effect": "Green Matrix-style falling characters overlay"
+    },
+    {
+      "name": "AI Agent Jokes",
+      "trigger": "Click the AI agent 4 times",
+      "effect": "Shows 3 jokes, then 'out of energy' message with auto-scroll to support"
+    },
+    {
+      "name": "Coffee Agent Jokes",
+      "trigger": "Click the coffee agent 4 times",
+      "effect": "Shows 3 coffee jokes, then prompts for support"
+    }
+  ],
+  "testing": {
+    "stripe_test_cards": [
+      "4242 4242 4242 4242 - Success",
+      "4000 0000 0000 9995 - Declined"
+    ],
+    "test_scenarios": [
+      "One-time donation ($3, $5, $10, custom)",
+      "Monthly subscription",
+      "Custom amount (min/max validation)",
+      "Webhook signature verification",
+      "Goal progress updates",
+      "Quote rotation (check at noon AEST)",
+      "A/B test variants",
+      "Mobile responsiveness",
+      "Matrix easter egg activation",
+      "AI agent dragging and jokes"
+    ]
+  },
+  "meta": {
+    "created": "2024",
+    "last_updated": "2024-11-02",
+    "author": "Built with ❤️ and ☕",
+    "license": "MIT",
+    "inspiration": "Cyberpunk aesthetics meets modern web development"
+  }
+}
+

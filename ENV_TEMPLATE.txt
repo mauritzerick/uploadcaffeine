@@ -1,0 +1,42 @@
+# ============================================
+# 🔐 COPY THIS TO .env FILE
+# ============================================
+# Run: cp ENV_TEMPLATE.txt .env
+# Then fill in your values below
+# ============================================
+
+# Database
+DATABASE_URL="file:./dev.db"
+
+# Stripe API Keys (get from: https://dashboard.stripe.com/test/apikeys)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_YOUR_PUBLISHABLE_KEY_HERE"
+STRIPE_SECRET_KEY="sk_test_YOUR_SECRET_KEY_HERE"
+
+# Stripe Webhook Secret (get from: stripe listen command output)
+STRIPE_WEBHOOK_SECRET="whsec_YOUR_WEBHOOK_SECRET_HERE"
+
+# App Configuration
+NEXT_PUBLIC_BASE_URL="http://localhost:3000"
+NEXT_PUBLIC_MONTHLY_GOAL_CENTS="100000"
+
+# Admin Access Token
+WEB_ADMIN_TOKEN="your-secure-admin-token-here"
+
+# ============================================
+# 🚀 QUICK SETUP STEPS:
+# ============================================
+# 1. Sign up at: https://stripe.com
+# 2. Get test keys: https://dashboard.stripe.com/test/apikeys
+# 3. Install Stripe CLI: brew install stripe/stripe-cli/stripe
+# 4. Login: stripe login
+# 5. Start webhook forwarding: stripe listen --forward-to localhost:3000/api/webhook
+# 6. Copy webhook secret (starts with whsec_) to STRIPE_WEBHOOK_SECRET above
+# 7. Save this file as .env
+# 8. Run: npm run db:push
+# 9. Run: npm run dev
+# 10. Test with card: 4242 4242 4242 4242
+#
+# ✅ You're ready to accept payments!
+# ============================================
+
+
