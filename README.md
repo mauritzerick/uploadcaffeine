@@ -63,6 +63,7 @@ DATABASE_URL="file:./dev.db"
 # For production (Turso/libSQL) - Set in Vercel, not in .env.local:
 # DATABASE_URL=libsql://<your-db>.turso.io
 # DATABASE_AUTH_TOKEN=<your-token>
+# DIAG_TOKEN=<random-string-for-diagnostics>
 
 # Monthly Goal (in cents, e.g., 15000 = $150 AUD)
 NEXT_PUBLIC_MONTHLY_GOAL_CENTS=15000
@@ -160,23 +161,27 @@ Access `/web-admin?token=YOUR_ADMIN_TOKEN` to manage:
    - Events: `payment_intent.succeeded`, `payment_intent.payment_failed`
    - Add webhook secret to `.env.local`
 
-### Database
+### Database (Prisma) — Turso / libSQL
 
-#### ✅ Database Environment Variables for Turso
-
-When using Turso / libSQL with Prisma, you must set two environment variables in Vercel:
+Set these in Vercel → Settings → Environment Variables (Production + Preview):
 
 ```
 DATABASE_URL=libsql://<your-db>.turso.io
-DATABASE_AUTH_TOKEN=<your-token>
+DATABASE_AUTH_TOKEN=<your token>
+# optional debug
+DIAG_TOKEN=<random>
 ```
 
-⚠️ **Do NOT put these in the codebase** — set them in Vercel > Environment Variables.
+> Do **not** append `?authToken=` to `DATABASE_URL`. Keep the token in `DATABASE_AUTH_TOKEN`.
 
-To verify your database connection after deploy:
+#### Diagnostics
+
+After deploy, verify DB connectivity:
 ```
-https://yourdomain.com/api/debug-stats
+GET /api/diagnostics/db?token=<DIAG_TOKEN>
 ```
+
+This returns `{ ok: true/false, mode, versions }` and masks secrets. All Prisma DB routes run on **Node.js** runtime.
 
 #### Local Development (SQLite)
 
@@ -199,17 +204,6 @@ npm run db:studio
 npm run db:seed
 npm run db:seed-flags
 ```
-
-#### Production (Turso / libSQL)
-
-For production on Vercel, use Turso:
-
-```env
-DATABASE_URL=libsql://<your-db>.turso.io
-DATABASE_AUTH_TOKEN=<your-token>
-```
-
-The `DATABASE_AUTH_TOKEN` is automatically combined with the `DATABASE_URL` when creating the libSQL client.
 
 ## 🎮 Easter Eggs
 

@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import prisma from '@/lib/prisma'
 
 /**
  * One-time database initialization endpoint
  * Run this once to create all tables in Turso
  */
+export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function POST() {

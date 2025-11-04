@@ -1,20 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
   webpack: (config, { isServer }) => {
-    // Ignore markdown files (fixes @prisma/adapter-libsql README.md import errors)
-    config.module.rules.push({
-      test: /\.md$/,
-      use: 'ignore-loader',
-    })
-
-    // Ignore TypeScript definition files from libsql packages
-    config.module.rules.push({
-      test: /\.d\.ts$/,
-      use: 'ignore-loader',
-    })
-
-    // Exclude libsql packages from being processed by webpack (server-side only)
+    // Prevent markdown from node_modules breaking webpack (libsql packages ship README.md)
+    config.module.rules.push({ test: /\.md$/, use: 'ignore-loader' })
+    
+    // Exclude libsql from client-side bundling
     if (isServer) {
       config.externals = config.externals || []
       config.externals.push({
@@ -22,7 +12,7 @@ const nextConfig = {
         '@prisma/adapter-libsql': 'commonjs @prisma/adapter-libsql',
       })
     }
-
+    
     return config
   },
 }

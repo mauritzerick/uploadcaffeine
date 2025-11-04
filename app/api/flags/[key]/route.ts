@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import prisma from '@/lib/prisma'
 import { requireAdminAuth } from '@/lib/adminAuth'
 
+export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 // PATCH /api/flags/[key] - Toggle a specific feature flag (admin only)

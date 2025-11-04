@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import prisma from '@/lib/prisma'
 import { requireAdminAuth } from '@/lib/adminAuth'
 
+export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 // GET /api/flags - List all feature flags (public for client consumption)

@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import prisma from '@/lib/prisma'
 
 /**
  * Debug endpoint to check what's in the database
  * Only works in development or with proper auth
  */
+export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function GET() {

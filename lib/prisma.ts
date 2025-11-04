@@ -1,104 +1,86 @@
 import { PrismaClient } from '@prisma/client'
-import { createClient } from '@libsql/client'
-import { PrismaLibSQL } from '@prisma/adapter-libsql'
+import type { Prisma } from '@prisma/client'
+import { getEnvSnapshot } from './env'
 
-// Prisma Client singleton pattern for Next.js
-// Prevents multiple instances in development
+// Lazy-load libsql to avoid bundling issues
+let libsqlClient: any = null
+let PrismaLibSQLAdapter: any = null
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
+function loadLibSQL() {
+  if (!libsqlClient) {
+    // @ts-ignore - dynamic require to avoid bundling issues
+    libsqlClient = require('@libsql/client')
+  }
+  if (!PrismaLibSQLAdapter) {
+    // @ts-ignore - dynamic require to avoid bundling issues
+    PrismaLibSQLAdapter = require('@prisma/adapter-libsql')
+  }
+  return { createClient: libsqlClient.createClient, PrismaLibSQL: PrismaLibSQLAdapter.PrismaLibSQL }
 }
 
-// Create Prisma client with Turso/libsql adapter if needed
-// NOTE: Turso / libSQL uses DATABASE_AUTH_TOKEN injected by Vercel
-// This value does NOT exist in the repo — it must be added in the Vercel dashboard.
-const getPrismaClient = (): PrismaClient => {
-  let databaseUrl = process.env.DATABASE_URL || ''
-  const authToken = process.env.DATABASE_AUTH_TOKEN
-  
-  // If using Turso (libsql://), use libsql adapter
-  if (databaseUrl.startsWith('libsql://')) {
-    // If DATABASE_URL doesn't include authToken but we have DATABASE_AUTH_TOKEN, combine them
-    if (!databaseUrl.includes('authToken') && authToken) {
-      const separator = databaseUrl.includes('?') ? '&' : '?'
-      databaseUrl = `${databaseUrl}${separator}authToken=${authToken}`
+// Single instance in dev
+// eslint-disable-next-line no-var
+var prismaGlobal: PrismaClient | undefined = (global as any).__PRISMA__
+
+function makeClient() {
+  const url = process.env.DATABASE_URL
+  if (!url) {
+    throw new Error('DATABASE_URL is not set')
+  }
+
+  // libsql/turso path (requires DATABASE_AUTH_TOKEN)
+  if (url.startsWith('libsql://')) {
+    const token = process.env.DATABASE_AUTH_TOKEN
+    if (!token) {
+      throw new Error('DATABASE_AUTH_TOKEN is required for libsql:// DATABASE_URL')
     }
-    
-    const libsql = createClient({ 
-      url: databaseUrl,
-    })
-    const adapter = new PrismaLibSQL(libsql as any)
-    
-    return new PrismaClient({
-      adapter: adapter as any,
-      log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-    } as any)
+    try {
+      const { createClient, PrismaLibSQL } = loadLibSQL()
+      const libsql = createClient({ url, authToken: token })
+      const adapter = new PrismaLibSQL(libsql)
+      const client = new PrismaClient({ adapter } as Prisma.PrismaClientOptions)
+      return client
+    } catch (e: any) {
+      const hint = 'If you see "bind" undefined, it usually means the libsql adapter/client failed to construct. Ensure @libsql/client and @prisma/adapter-libsql are installed, and this route runs on Node.js runtime.'
+      throw new Error(`Failed to init libsql adapter: ${e?.message || e}. ${hint}`)
+    }
   }
-  
-  // Otherwise use default SQLite
-  return new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-  })
+
+  // SQLite file path (e.g., file:/tmp/prod.db on Vercel)
+  if (url.startsWith('file:')) {
+    return new PrismaClient()
+  }
+
+  throw new Error(`Unsupported DATABASE_URL scheme: ${url}`)
 }
 
-// Lazy initialization - only create client when actually accessed (not during build)
-function getPrisma(): PrismaClient {
-  if (globalForPrisma.prisma) {
-    return globalForPrisma.prisma
+// Lazy initialization - only create when accessed (not during build)
+function getPrisma() {
+  if (prismaGlobal) {
+    return prismaGlobal
   }
   
-  // Only initialize if we have DATABASE_URL (not during build)
-  if (!process.env.DATABASE_URL) {
-    throw new Error('DATABASE_URL is not set. Prisma client cannot be initialized.')
+  // Don't initialize during build if DATABASE_URL is libsql:// without token
+  if (process.env.DATABASE_URL?.startsWith('libsql://') && !process.env.DATABASE_AUTH_TOKEN) {
+    // Return a proxy that will throw a helpful error when accessed
+    return new Proxy({} as PrismaClient, {
+      get() {
+        throw new Error('DATABASE_AUTH_TOKEN is required for libsql:// DATABASE_URL. Set it in Vercel environment variables.')
+      }
+    })
   }
   
-  const client = getPrismaClient()
-  // Cache in both dev and production to prevent multiple instances
-  globalForPrisma.prisma = client
+  const client = makeClient()
+  if (process.env.NODE_ENV !== 'production') {
+    prismaGlobal = client
+    ;(global as any).__PRISMA__ = client
+  }
   return client
 }
 
-// Export a proxy that only initializes when accessed
-export const prisma = new Proxy({} as PrismaClient, {
-  get(target, prop) {
-    try {
-      const client = getPrisma()
-      if (!client) {
-        throw new Error('Prisma client failed to initialize. Check DATABASE_URL.')
-      }
-      
-      const value = (client as any)[prop]
-      
-      // Handle undefined/null values
-      if (value === undefined || value === null) {
-        return undefined
-      }
-      
-      // Bind functions directly to the client instance
-      if (typeof value === 'function') {
-        return value.bind(client)
-      }
-      
-      // For Prisma models (objects with methods like findMany, aggregate, etc.)
-      // Return the model directly - Prisma models already have their methods bound correctly
-      if (typeof value === 'object' && value !== null) {
-        return value
-      }
-      
-      return value
-    } catch (error: any) {
-      // If initialization fails, provide helpful error
-      throw new Error(`Prisma client error: ${error.message}. Make sure DATABASE_URL is set correctly.`)
-    }
-  },
-  has(target, prop) {
-    try {
-      const client = getPrisma()
-      return client ? prop in client : false
-    } catch {
-      return false
-    }
-  }
-})
+const prisma = getPrisma()
 
+export default prisma
 
+// Also export as named export for backward compatibility
+export { prisma }
