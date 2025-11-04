@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+/**
+ * Force refresh endpoint - manually trigger stats recalculation
+ * Useful for debugging
+ */
 export const dynamic = 'force-dynamic'
 
-export async function GET() {
+export async function POST() {
   try {
     // Get monthly goal from env
     const monthlyGoalCents = parseInt(process.env.NEXT_PUBLIC_MONTHLY_GOAL_CENTS || '15000')
@@ -18,14 +22,13 @@ export async function GET() {
         createdAt: {
           gte: startOfMonth,
         },
-        monthly: false, // One-time donations
+        monthly: false,
       },
       _sum: {
         amountCents: true,
       },
     })
 
-    // Get active monthly subscriptions (total ever, as they recur)
     const monthlySubscriptions = await prisma.supporter.aggregate({
       where: {
         monthly: true,
@@ -39,62 +42,27 @@ export async function GET() {
     const subscriptionTotal = monthlySubscriptions._sum.amountCents || 0
     const totalRaisedCents = oneTimeTotal + subscriptionTotal
 
-    // Get recent supporters (last 10)
-    const recentSupporters = await prisma.supporter.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
-      take: 10,
-      select: {
-        id: true,
-        name: true,
-        amountCents: true,
-        currency: true,
-        monthly: true,
-        message: true,
-        createdAt: true,
-      },
-    })
-
-    // Get total supporters count
-    const totalSupporters = await prisma.supporter.count()
-
-    // Calculate progress percentage
     const progressPercentage = Math.min(
       Math.round((totalRaisedCents / monthlyGoalCents) * 100),
       100
     )
 
-    // Debug logging
-    console.log('📊 Stats API response:', {
-      totalRaisedCents,
-      monthlyGoalCents,
-      progressPercentage,
-      oneTimeTotal,
-      subscriptionTotal,
-      totalSupporters,
-    })
-
     return NextResponse.json({
+      success: true,
       goal: {
         targetCents: monthlyGoalCents,
         currentCents: totalRaisedCents,
         progressPercentage,
-        oneTimeTotal: oneTimeTotal,
-        subscriptionTotal: subscriptionTotal,
+        oneTimeTotal,
+        subscriptionTotal,
       },
-      supporters: {
-        total: totalSupporters,
-        recent: recentSupporters,
-      },
+      message: 'Stats refreshed successfully',
     })
-  } catch (error) {
-    console.error('Error fetching stats:', error)
+  } catch (error: any) {
     return NextResponse.json(
-      { error: 'Failed to fetch stats' },
+      { success: false, error: error.message },
       { status: 500 }
     )
   }
 }
-
 

@@ -55,6 +55,8 @@ export default function InlinePayForm({ amount, onSuccess, onCancel }: InlinePay
         trackEvent('checkout_success', { amount: amount / 100, method: 'inline' })
         
         // ✅ IMMEDIATE FIX: Refresh goal progress immediately
+        console.log('🔄 Payment succeeded, refreshing stats...')
+        // Refresh stats immediately - mutate will trigger a revalidation
         mutate('/api/stats')
         
         // Broadcast payment success event for other components

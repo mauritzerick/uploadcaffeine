@@ -8,7 +8,7 @@ import { useEffect } from 'react'
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 export default function GoalProgress() {
-  const { data, error } = useSWR('/api/stats', fetcher, {
+  const { data, error, mutate } = useSWR('/api/stats', fetcher, {
     refreshInterval: 30000, // Refresh every 30 seconds (fallback)
     revalidateOnFocus: true, // Refresh when user returns to tab
     revalidateOnReconnect: true, // Refresh when network reconnects
@@ -18,28 +18,44 @@ export default function GoalProgress() {
   // Listen for payment success events to refresh immediately
   useEffect(() => {
     const handlePaymentSuccess = () => {
+      console.log('🔄 Payment success event received, refreshing stats...')
+      // Force revalidation
       mutate('/api/stats')
     }
     
     window.addEventListener('payment-success', handlePaymentSuccess)
     return () => window.removeEventListener('payment-success', handlePaymentSuccess)
-  }, [])
-
-  if (error) return null
-  if (!data) {
-    return (
-      <div className="w-full h-32 bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl animate-pulse" />
-    )
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // mutate is stable, no need to include in deps
 
   // Use real data only
-  const { goal } = data
+  const { goal } = data || {}
   const goalData = goal || {
     targetCents: parseInt(process.env.NEXT_PUBLIC_MONTHLY_GOAL_CENTS || '15000'),
     currentCents: 0,
     progressPercentage: 0,
     oneTimeTotal: 0,
     subscriptionTotal: 0,
+  }
+  
+  // Debug logging
+  useEffect(() => {
+    if (data && goal) {
+      console.log('📊 Stats data updated:', {
+        currentCents: goal.currentCents,
+        targetCents: goal.targetCents,
+        progressPercentage: goal.progressPercentage,
+        oneTimeTotal: goal.oneTimeTotal,
+        subscriptionTotal: goal.subscriptionTotal,
+      })
+    }
+  }, [data, goal])
+
+  if (error) return null
+  if (!data) {
+    return (
+      <div className="w-full h-32 bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl animate-pulse" />
+    )
   }
   
   const currentAmount = (goalData.currentCents / 100).toFixed(2)
@@ -138,6 +154,19 @@ export default function GoalProgress() {
             <span>goal</span>
           </div>
         </div>
+
+        {/* Debug: Manual Refresh Button (only in development) */}
+        {process.env.NODE_ENV === 'development' && (
+          <button
+            onClick={() => {
+              console.log('🔄 Manual refresh triggered')
+              mutate('/api/stats')
+            }}
+            className="mt-4 px-4 py-2 bg-cyan-500/20 border border-cyan-500/50 rounded text-xs text-cyan-400 hover:bg-cyan-500/30"
+          >
+            🔄 Force Refresh
+          </button>
+        )}
 
         {/* Additional stats */}
         {goalData.oneTimeTotal > 0 || goalData.subscriptionTotal > 0 ? (
