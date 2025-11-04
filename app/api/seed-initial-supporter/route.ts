@@ -10,16 +10,39 @@ export const dynamic = 'force-dynamic'
  * Supports both GET and POST for easier access
  */
 export async function GET() {
-  return POST(new Request('', { method: 'POST' }))
+  // Call the POST handler logic directly
+  return handleSeed()
 }
 
 export async function POST(req: Request) {
+  return handleSeed()
+}
+
+async function handleSeed() {
   try {
-    // Optional: Add basic auth check (uncomment if needed)
-    // const auth = req.headers.get('authorization')
-    // if (auth !== `Bearer ${process.env.ADMIN_TOKEN}`) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    // }
+    // Check DATABASE_URL first
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'DATABASE_URL is not configured',
+          message: 'Database environment variable is missing',
+        },
+        { status: 500 }
+      )
+    }
+
+    // Check if we're using libsql and need auth token
+    if (process.env.DATABASE_URL.startsWith('libsql://') && !process.env.DATABASE_AUTH_TOKEN) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'DATABASE_AUTH_TOKEN is required',
+          message: 'DATABASE_AUTH_TOKEN is required for libsql:// DATABASE_URL',
+        },
+        { status: 500 }
+      )
+    }
 
     // Check if initial supporter already exists
     const existing = await prisma.supporter.findFirst({
