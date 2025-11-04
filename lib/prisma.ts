@@ -54,8 +54,31 @@ function getPrisma(): PrismaClient {
 export const prisma = new Proxy({} as PrismaClient, {
   get(target, prop) {
     const client = getPrisma()
-    const value = client[prop as keyof PrismaClient]
-    return typeof value === 'function' ? value.bind(client) : value
+    if (!client) {
+      throw new Error('Prisma client failed to initialize. Check DATABASE_URL.')
+    }
+    
+    const value = (client as any)[prop]
+    
+    // Handle undefined/null values
+    if (value === undefined || value === null) {
+      return undefined
+    }
+    
+    // Bind functions to the client instance
+    if (typeof value === 'function') {
+      return value.bind(client)
+    }
+    
+    return value
+  },
+  has(target, prop) {
+    try {
+      const client = getPrisma()
+      return client ? prop in client : false
+    } catch {
+      return false
+    }
   }
 })
 

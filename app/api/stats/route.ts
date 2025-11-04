@@ -9,8 +9,9 @@ export async function GET() {
     const monthlyGoalCents = parseInt(process.env.NEXT_PUBLIC_MONTHLY_GOAL_CENTS || '15000')
 
     // Get current month's supporters
+    // Use UTC to avoid timezone issues - database stores dates in UTC
     const now = new Date()
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+    const startOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0))
 
     // Calculate total raised this month
     const monthlySupport = await prisma.supporter.aggregate({
