@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+// Force dynamic rendering to prevent build-time Prisma connection
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 // AEST timezone offset (UTC+10 for standard time, UTC+11 for daylight saving)
 // We'll use UTC+10 as base (AEST)
 function getAESTDate(): string {
