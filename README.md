@@ -56,8 +56,13 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_your_publishable_key_here
 # Base URL
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
-# Database (SQLite by default)
+# Database
+# For local development (SQLite):
 DATABASE_URL="file:./dev.db"
+
+# For production (Turso/libSQL) - Set in Vercel, not in .env.local:
+# DATABASE_URL=libsql://<your-db>.turso.io
+# DATABASE_AUTH_TOKEN=<your-token>
 
 # Monthly Goal (in cents, e.g., 15000 = $150 AUD)
 NEXT_PUBLIC_MONTHLY_GOAL_CENTS=15000
@@ -157,6 +162,30 @@ Access `/web-admin?token=YOUR_ADMIN_TOKEN` to manage:
 
 ### Database
 
+#### ✅ Database Environment Variables for Turso
+
+When using Turso / libSQL with Prisma, you must set two environment variables in Vercel:
+
+```
+DATABASE_URL=libsql://<your-db>.turso.io
+DATABASE_AUTH_TOKEN=<your-token>
+```
+
+⚠️ **Do NOT put these in the codebase** — set them in Vercel > Environment Variables.
+
+To verify your database connection after deploy:
+```
+https://yourdomain.com/api/debug-stats
+```
+
+#### Local Development (SQLite)
+
+For local development, use SQLite:
+
+```env
+DATABASE_URL="file:./dev.db"
+```
+
 Using Prisma with SQLite:
 
 ```bash
@@ -170,6 +199,17 @@ npm run db:studio
 npm run db:seed
 npm run db:seed-flags
 ```
+
+#### Production (Turso / libSQL)
+
+For production on Vercel, use Turso:
+
+```env
+DATABASE_URL=libsql://<your-db>.turso.io
+DATABASE_AUTH_TOKEN=<your-token>
+```
+
+The `DATABASE_AUTH_TOKEN` is automatically combined with the `DATABASE_URL` when creating the libSQL client.
 
 ## 🎮 Easter Eggs
 
@@ -206,8 +246,10 @@ STRIPE_SECRET_KEY
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 NEXT_PUBLIC_BASE_URL
 DATABASE_URL
+DATABASE_AUTH_TOKEN          # Required for Turso/libSQL
 ADMIN_TOKEN
 STRIPE_WEBHOOK_SECRET
+NEXT_PUBLIC_MONTHLY_GOAL_CENTS
 ```
 
 ### Custom Domain

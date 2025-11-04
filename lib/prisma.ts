@@ -10,11 +10,20 @@ const globalForPrisma = globalThis as unknown as {
 }
 
 // Create Prisma client with Turso/libsql adapter if needed
+// NOTE: Turso / libSQL uses DATABASE_AUTH_TOKEN injected by Vercel
+// This value does NOT exist in the repo — it must be added in the Vercel dashboard.
 const getPrismaClient = (): PrismaClient => {
-  const databaseUrl = process.env.DATABASE_URL || ''
+  let databaseUrl = process.env.DATABASE_URL || ''
+  const authToken = process.env.DATABASE_AUTH_TOKEN
   
   // If using Turso (libsql://), use libsql adapter
   if (databaseUrl.startsWith('libsql://')) {
+    // If DATABASE_URL doesn't include authToken but we have DATABASE_AUTH_TOKEN, combine them
+    if (!databaseUrl.includes('authToken') && authToken) {
+      const separator = databaseUrl.includes('?') ? '&' : '?'
+      databaseUrl = `${databaseUrl}${separator}authToken=${authToken}`
+    }
+    
     const libsql = createClient({ 
       url: databaseUrl,
     })
