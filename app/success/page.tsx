@@ -37,7 +37,7 @@ function SuccessContent() {
 
   useEffect(() => {
     // Track success
-    trackEvent('checkout_success')
+    trackEvent('checkout_success', {})
     
     // Select random thanks message
     setThanksMessage(cyberThanksMessages[Math.floor(Math.random() * cyberThanksMessages.length)])

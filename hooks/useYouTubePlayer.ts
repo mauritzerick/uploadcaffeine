@@ -53,6 +53,9 @@ export function useYouTubePlayer(options: UseYouTubePlayerOptions): UseYouTubePl
         if (!mounted || !playerRef.current) return
 
         // Create player instance
+        if (!window.YT) {
+          throw new Error('YouTube API not loaded')
+        }
         player = new window.YT.Player(playerRef.current, {
           videoId,
           playerVars: {

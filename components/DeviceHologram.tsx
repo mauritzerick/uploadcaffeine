@@ -71,12 +71,12 @@ export default function DeviceHologram({ children }: DeviceHologramProps) {
 
   const handleOpen = () => {
     setIsVisible(true)
-    trackEvent('hologram_open')
+    trackEvent('hologram_open', {})
 
     // Auto-close after 6 seconds
     const timer = setTimeout(() => {
       setIsVisible(false)
-      trackEvent('hologram_autoclose')
+      trackEvent('hologram_autoclose', {})
     }, 6000)
     
     setAutoCloseTimer(timer)
@@ -84,7 +84,7 @@ export default function DeviceHologram({ children }: DeviceHologramProps) {
 
   const handleClose = () => {
     setIsVisible(false)
-    trackEvent('hologram_close')
+    trackEvent('hologram_close', {})
     if (autoCloseTimer) {
       clearTimeout(autoCloseTimer)
     }

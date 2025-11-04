@@ -1,6 +1,8 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+export const dynamic = 'force-dynamic'
+
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Shield, Lock, Check, X, Plus, Search, History, RefreshCw } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -14,7 +16,7 @@ interface FeatureFlag {
   jsonConfig?: Record<string, any>
 }
 
-export default function WebAdminPage() {
+function WebAdminContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
@@ -557,4 +559,18 @@ export default function WebAdminPage() {
   )
 }
 
-
+export default function WebAdminPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0a0a14] via-[#120a1f] to-[#0a0a14]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+          className="w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full"
+        />
+      </div>
+    }>
+      <WebAdminContent />
+    </Suspense>
+  )
+}

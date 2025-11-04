@@ -48,7 +48,7 @@ export default function InlinePayForm({ amount, onSuccess, onCancel }: InlinePay
       if (confirmError) {
         setError(confirmError.message || 'Payment failed')
         setLoading(false)
-        trackEvent('payment_failed', { error: confirmError.message, amount: amount / 100 })
+        trackEvent('payment_failed', { error: confirmError.message || 'Payment failed', amount: amount / 100 })
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
         setSuccess(true)
         trackEvent('checkout_success', { amount: amount / 100, method: 'inline' })
@@ -61,7 +61,7 @@ export default function InlinePayForm({ amount, onSuccess, onCancel }: InlinePay
     } catch (err: any) {
       setError(err.message || 'An unexpected error occurred')
       setLoading(false)
-      trackEvent('payment_error', { error: err.message, amount: amount / 100 })
+      trackEvent('payment_error', { error: err instanceof Error ? err.message : String(err), amount: amount / 100 })
     }
   }
 

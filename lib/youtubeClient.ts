@@ -6,13 +6,6 @@
  */
 
 // Global types for YouTube IFrame API
-declare global {
-  interface Window {
-    YT: typeof YT
-    onYouTubeIframeAPIReady?: () => void
-  }
-}
-
 export interface YTPlayer {
   playVideo: () => void
   pauseVideo: () => void
@@ -28,6 +21,25 @@ export interface YTPlayer {
   getCurrentTime: () => number
   getDuration: () => number
   destroy: () => void
+}
+
+interface YT {
+  Player: new (elementId: string | HTMLElement, options: any) => YTPlayer
+  PlayerState: {
+    UNSTARTED: number
+    ENDED: number
+    PLAYING: number
+    PAUSED: number
+    BUFFERING: number
+    CUED: number
+  }
+}
+
+declare global {
+  interface Window {
+    YT?: YT
+    onYouTubeIframeAPIReady?: () => void
+  }
 }
 
 export enum PlayerState {

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { validateAdminAuth } from '@/lib/adminAuth'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     const result = await validateAdminAuth()

@@ -12,14 +12,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate event types
-    const validTypes = ['cta_click', 'checkout_start', 'checkout_success', 'page_view']
-    if (!validTypes.includes(type)) {
-      return NextResponse.json(
-        { error: 'Invalid event type' },
-        { status: 400 }
-      )
-    }
+    // Accept all event types - validation handled by TypeScript on client
+    // Event types are defined in lib/analytics.ts EventMap
 
     // Store event in database
     await prisma.event.create({

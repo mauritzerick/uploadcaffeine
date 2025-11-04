@@ -22,7 +22,8 @@ export default function GlitchAgent() {
   const [kaleidoscopeTriggered, setKaleidoscopeTriggered] = useState(false)
   const [spaceHoldStart, setSpaceHoldStart] = useState<number | null>(null)
 
-  const glitchIntensity = (getFlag('effect_glitch_cinematic')?.intensity as 'low' | 'med' | 'high') || 'med'
+  const glitchFlag = getFlag('effect_glitch_cinematic')
+  const glitchIntensity = (glitchFlag?.jsonConfig?.intensity as 'low' | 'med' | 'high') || 'med'
 
   const handleGlitchClick = useCallback(() => {
     if (!isEnabled('effect_glitch_cinematic')) return

@@ -52,7 +52,11 @@ export async function getPostBySlug(slug: string): Promise<{ Content: () => JSX.
   const { content: compiledContent } = await compileMDX({
     source: content,
     options: { 
-      parseFrontmatter: false 
+      parseFrontmatter: false,
+      mdxOptions: {
+        remarkPlugins: [],
+        rehypePlugins: [],
+      }
     }
   })
   

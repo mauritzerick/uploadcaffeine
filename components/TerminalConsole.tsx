@@ -93,7 +93,7 @@ export default function TerminalConsole() {
           e.preventDefault()
           setIsOpen((prev) => {
             const newState = !prev
-            trackEvent(newState ? 'terminal_open' : 'terminal_close')
+            trackEvent(newState ? 'terminal_open' : 'terminal_close', {})
             return newState
           })
         }
@@ -102,7 +102,7 @@ export default function TerminalConsole() {
       // Escape to close
       if (e.key === 'Escape' && isOpen) {
         setIsOpen(false)
-        trackEvent('terminal_close')
+        trackEvent('terminal_close', {})
       }
     }
 
