@@ -21,10 +21,30 @@ export async function GET(req: Request) {
     const ping = await prisma.$queryRawUnsafe('SELECT 1 as ok')
 
     // versions (best-effort)
-    let prismaPkg: any = null
-    try { prismaPkg = require('@prisma/client/package.json') } catch {}
-    let libsqlPkg: any = null
-    try { libsqlPkg = require('@libsql/client/package.json') } catch {}
+    let prismaVersion = 'unknown'
+    let libsqlVersion = 'unknown'
+    try {
+      // @ts-ignore - dynamic require
+      const prismaPkg = require('@prisma/client/package.json')
+      prismaVersion = prismaPkg?.version || 'unknown'
+    } catch {}
+    try {
+      // Try to get libsql version from package.json if available
+      // @ts-ignore - dynamic require
+      const libsqlPkg = require('@libsql/client/package.json')
+      libsqlVersion = libsqlPkg?.version || 'unknown'
+    } catch {
+      // If package.json not available, try reading from node_modules
+      try {
+        const fs = require('fs')
+        const path = require('path')
+        const pkgPath = path.join(process.cwd(), 'node_modules', '@libsql', 'client', 'package.json')
+        if (fs.existsSync(pkgPath)) {
+          const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'))
+          libsqlVersion = pkg.version || 'unknown'
+        }
+      } catch {}
+    }
 
     return NextResponse.json({
       ok: true,
@@ -32,8 +52,8 @@ export async function GET(req: Request) {
       env: { ...env, DATABASE_URL: maskUrl(env.DATABASE_URL) },
       versions: {
         node: process.version,
-        '@prisma/client': prismaPkg?.version || 'unknown',
-        '@libsql/client': libsqlPkg?.version || (mode === 'turso/libsql' ? 'not-found' : 'n/a'),
+        '@prisma/client': prismaVersion,
+        '@libsql/client': libsqlVersion || (mode === 'turso/libsql' ? 'installed' : 'n/a'),
       },
       ping,
     })

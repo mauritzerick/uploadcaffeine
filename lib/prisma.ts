@@ -162,24 +162,36 @@ function getPrismaInstance(): PrismaClient {
     return createDeferredProxy()
   }
 
-  // At runtime, check if we have a cached real client (not deferred proxy)
+  // AT RUNTIME: Always try to get real Prisma client
+  // Check if we have a cached real client
   if (prismaGlobal) {
-    // Verify it's a real client by checking for a Prisma model
-    if ('supporter' in prismaGlobal || '$connect' in prismaGlobal) {
+    // Verify it's a real client (not a deferred proxy)
+    // Real Prisma clients have actual model properties with methods
+    const testModel = (prismaGlobal as any).supporter
+    if (testModel && typeof testModel.findMany === 'function') {
+      // This is a real Prisma client
       return prismaGlobal
     }
-    // If it's a deferred proxy, clear it and initialize fresh
+    // If it's a deferred proxy or invalid, clear it
     prismaGlobal = undefined
   }
 
-  // At runtime, if using libsql and missing token, return a deferred proxy with helpful error
+  // At runtime, if using libsql and missing token, throw helpful error
+  // Don't return deferred proxy - we want a clear error at runtime
   if (url?.startsWith('libsql://') && !process.env.DATABASE_AUTH_TOKEN) {
-    return createDeferredProxy()
+    throw new Error('DATABASE_AUTH_TOKEN is required for libsql:// DATABASE_URL. Set it in Vercel environment variables.')
   }
 
   // At runtime, try to initialize with all required vars
   try {
     const client = makeClient()
+    
+    // Verify the client was created correctly
+    const testModel = (client as any).supporter
+    if (!testModel || typeof testModel.findMany !== 'function') {
+      throw new Error('Prisma client created but models are not accessible. Check adapter configuration.')
+    }
+    
     // Cache the client
     prismaGlobal = client
     if (process.env.NODE_ENV !== 'production') {
