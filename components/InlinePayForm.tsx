@@ -99,8 +99,8 @@ export default function InlinePayForm({ amount, onSuccess, onCancel }: InlinePay
               billingDetails: {
                 name: 'auto',
                 email: 'auto',
-                phone: 'never',
-                address: 'never',
+                phone: 'auto', // Changed from 'never' to avoid billing_details requirement in confirmPayment
+                address: 'auto', // Changed from 'never' to avoid billing_details requirement in confirmPayment
               },
             },
             terms: {
