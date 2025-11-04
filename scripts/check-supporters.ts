@@ -46,10 +46,10 @@ async function checkSupporters() {
       args: [startOfMonth.toISOString()],
     })
 
-    const total = monthlySupport.rows[0]?.total || 0
+    const total = (monthlySupport.rows[0]?.total as number) || 0
     console.log('📈 Current Month Stats:')
     console.log(`  Start of Month: ${startOfMonth.toISOString()}`)
-    console.log(`  One-Time Total: $${(total / 100).toFixed(2)}`)
+    console.log(`  One-Time Total: $${(Number(total) / 100).toFixed(2)}`)
     
     await client.close()
   } catch (error: any) {
