@@ -155,18 +155,19 @@ export default function GoalProgress() {
           </div>
         </div>
 
-        {/* Debug: Manual Refresh Button (only in development) */}
-        {process.env.NODE_ENV === 'development' && (
+        {/* Manual Refresh Button - Always visible */}
+        <div className="mt-4 flex items-center justify-center">
           <button
             onClick={() => {
               console.log('🔄 Manual refresh triggered')
+              // Force revalidation
               mutate('/api/stats')
             }}
-            className="mt-4 px-4 py-2 bg-cyan-500/20 border border-cyan-500/50 rounded text-xs text-cyan-400 hover:bg-cyan-500/30"
+            className="px-4 py-2 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/50 rounded-lg text-sm text-cyan-400 hover:bg-cyan-500/30 hover:border-cyan-500 transition-all font-mono"
           >
-            🔄 Force Refresh
+            🔄 Refresh Stats Now
           </button>
-        )}
+        </div>
 
         {/* Additional stats */}
         {goalData.oneTimeTotal > 0 || goalData.subscriptionTotal > 0 ? (
