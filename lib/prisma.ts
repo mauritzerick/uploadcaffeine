@@ -190,29 +190,34 @@ function getPrismaInstance(): PrismaClient {
 
   // At runtime, try to initialize with all required vars
   try {
-    console.log('🔧 Initializing Prisma client at runtime...', {
-      hasUrl: !!url,
-      hasToken: !!process.env.DATABASE_AUTH_TOKEN,
-      urlPrefix: url?.substring(0, 20),
-      isBuild: isBuild,
-      vercelEnv: process.env.VERCEL_ENV,
-      nextPhase: process.env.NEXT_PHASE,
-    })
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔧 Initializing Prisma client at runtime...', {
+        hasUrl: !!url,
+        hasToken: !!process.env.DATABASE_AUTH_TOKEN,
+        urlPrefix: url?.substring(0, 20),
+        vercelEnv: process.env.VERCEL_ENV,
+      })
+    }
     
     const client = makeClient()
     
-    // Verify the client was created correctly
-    const testModel = (client as any).supporter
-    if (!testModel || typeof testModel.findMany !== 'function') {
-      console.error('❌ Prisma client created but models are not accessible:', {
-        hasModel: !!testModel,
-        modelType: typeof testModel,
-        hasFindMany: typeof testModel?.findMany,
-      })
-      throw new Error('Prisma client created but models are not accessible. Check adapter configuration.')
+    // Verify the client was created correctly - test with a simple property access
+    try {
+      const testModel = (client as any).supporter
+      if (!testModel) {
+        throw new Error('Prisma client created but supporter model is undefined')
+      }
+      if (typeof testModel.findMany !== 'function') {
+        throw new Error(`Prisma client created but supporter.findMany is not a function (got ${typeof testModel.findMany})`)
+      }
+    } catch (testError: any) {
+      console.error('❌ Prisma client verification failed:', testError.message)
+      throw new Error(`Prisma client created but models are not accessible: ${testError.message}`)
     }
     
-    console.log('✅ Prisma client initialized successfully')
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ Prisma client initialized successfully')
+    }
     
     // Cache the client
     prismaGlobal = client
@@ -222,69 +227,31 @@ function getPrismaInstance(): PrismaClient {
     return client
   } catch (e: any) {
     // If initialization fails, re-throw with helpful message
-    console.error('❌ Failed to initialize Prisma client:', e.message, {
-      stack: process.env.NODE_ENV === 'development' ? e.stack : undefined,
-    })
+    console.error('❌ Failed to initialize Prisma client:', e.message)
     throw new Error(`Failed to initialize Prisma client: ${e.message}. Check DATABASE_URL and DATABASE_AUTH_TOKEN.`)
   }
 }
 
 // Export a proxy that only initializes when methods are called
+// SIMPLIFIED: Just return the value directly from the instance
 const prisma = new Proxy({} as PrismaClient, {
   get(_target, prop) {
     try {
       const instance = getPrismaInstance()
-      
-      // Get the actual value from the instance
-      const value = (instance as any)[prop]
-      
-      // If value is undefined, return undefined
-      if (value === undefined || value === null) {
-        return undefined
-      }
-      
-      // CRITICAL: Prisma models are objects with methods already bound
-      // We must return them directly without any modification
-      // Prisma models like prisma.supporter have methods like findMany, findFirst, etc.
-      if (typeof value === 'object' && value !== null) {
-        // Don't modify Date objects or arrays
-        if (value instanceof Date || Array.isArray(value)) {
-          return value
-        }
-        
-        // For Prisma model delegates, they have methods like findMany, findFirst, create, aggregate, etc.
-        // These are already properly bound by Prisma, so return them as-is
-        // Check if it has Prisma model methods (not just any object)
-        const hasPrismaMethods = typeof (value as any).findMany === 'function' ||
-                                  typeof (value as any).findFirst === 'function' ||
-                                  typeof (value as any).create === 'function' ||
-                                  typeof (value as any).aggregate === 'function' ||
-                                  typeof (value as any).count === 'function' ||
-                                  typeof (value as any).update === 'function' ||
-                                  typeof (value as any).delete === 'function'
-        
-        if (hasPrismaMethods) {
-          // This is a Prisma model delegate - return it directly
-          return value
-        }
-        
-        // For other objects, return as-is
-        return value
-      }
-      
-      // For functions, bind them to the instance
-      if (typeof value === 'function') {
-        return value.bind(instance)
-      }
-      
-      // For primitives, return as-is
-      return value
+      // Simply return the property from the instance - Prisma handles binding
+      return (instance as any)[prop]
     } catch (e: any) {
-      // If we can't get the instance, log the error and return a function that throws
-      console.error('Prisma proxy error:', e.message)
-      return () => {
-        throw new Error(`Cannot access Prisma client: ${e.message}`)
+      // If we can't get the instance, log the error
+      console.error('Prisma proxy error:', e.message, {
+        stack: process.env.NODE_ENV === 'development' ? e.stack : undefined,
+      })
+      // Return a function that throws with helpful error
+      if (typeof prop === 'string' && prop !== 'then' && prop !== 'catch') {
+        return (...args: any[]) => {
+          throw new Error(`Cannot access Prisma client: ${e.message}. Check DATABASE_URL and DATABASE_AUTH_TOKEN.`)
+        }
       }
+      throw e
     }
   },
   has(_target, prop) {
