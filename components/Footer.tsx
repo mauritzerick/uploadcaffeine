@@ -171,7 +171,7 @@ export default function Footer() {
             transition={{ duration: 3, repeat: Infinity }}
             className="text-cyan-400/40 text-xs mt-2 font-mono"
           >
-            Psst... Press 'M' three times for a surprise 🎮
+            Psst... Press &apos;M&apos; three times for a surprise 🎮
           </motion.p>
         </div>
       </div>

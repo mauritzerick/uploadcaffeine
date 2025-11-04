@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Shield, Lock, Check, X, Plus, Search, History, RefreshCw } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -30,12 +30,19 @@ export default function WebAdminPage() {
   const [newFlag, setNewFlag] = useState({ key: '', name: '', description: '', enabled: true })
   const [expandedFlag, setExpandedFlag] = useState<string | null>(null)
 
-  // Check authentication on mount
-  useEffect(() => {
-    checkAuth()
+  const loadFlags = useCallback(async () => {
+    try {
+      const response = await fetch('/api/flags')
+      if (response.ok) {
+        const data = await response.json()
+        setFlags(data.flags || [])
+      }
+    } catch (err) {
+      console.error('Failed to load flags:', err)
+    }
   }, [])
 
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
       // If token in URL, try to authenticate
       if (token) {
@@ -66,7 +73,12 @@ export default function WebAdminPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [token, router, loadFlags])
+
+  // Check authentication on mount
+  useEffect(() => {
+    checkAuth()
+  }, [checkAuth])
 
   const handleTokenSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -87,18 +99,6 @@ export default function WebAdminPage() {
       }
     } catch (err) {
       setError('Authentication failed')
-    }
-  }
-
-  const loadFlags = async () => {
-    try {
-      const response = await fetch('/api/flags')
-      if (response.ok) {
-        const data = await response.json()
-        setFlags(data.flags || [])
-      }
-    } catch (err) {
-      console.error('Failed to load flags:', err)
     }
   }
 

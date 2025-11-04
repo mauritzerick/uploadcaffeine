@@ -63,11 +63,14 @@ export default function QRCodeBanner() {
             {/* QR Code */}
             <div className="relative w-32 h-32 bg-white rounded-xl p-2">
               {qrCodeUrl ? (
-                <img
-                  src={qrCodeUrl}
-                  alt="Scan to visit uploadcaffeine.com"
-                  className="w-full h-full object-contain"
-                />
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={qrCodeUrl}
+                    alt="Scan to visit uploadcaffeine.com"
+                    className="w-full h-full object-contain"
+                  />
+                </>
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
                   <QrCode className="w-16 h-16 text-cyan-500 animate-pulse" />
@@ -199,11 +202,14 @@ export default function QRCodeBanner() {
                 {/* QR Code - Large for easy scanning */}
                 <div className="relative w-full aspect-square bg-white rounded-2xl p-4 mb-6">
                   {qrCodeUrl ? (
-                    <img
-                      src={qrCodeUrl}
-                      alt="Scan to visit uploadcaffeine.com"
-                      className="w-full h-full object-contain"
-                    />
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={qrCodeUrl}
+                        alt="Scan to visit uploadcaffeine.com"
+                        className="w-full h-full object-contain"
+                      />
+                    </>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <QrCode className="w-32 h-32 text-cyan-500 animate-pulse" />

@@ -67,7 +67,7 @@ export default function NeonQuotePage() {
           <div className="absolute inset-0 grid-bg opacity-10 rounded-2xl" />
           
           <p className="text-2xl md:text-4xl font-bold text-center relative z-10 text-cyan-300">
-            "{currentQuote}"
+            &ldquo;{currentQuote}&rdquo;
           </p>
           
           <motion.div
