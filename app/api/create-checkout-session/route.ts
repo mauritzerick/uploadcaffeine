@@ -79,6 +79,18 @@ export async function POST(request: NextRequest) {
     }
   } catch (error: any) {
     console.error('Error creating checkout session:', error)
+    
+    // Check if it's a Stripe configuration error
+    if (error.message?.includes('STRIPE_SECRET_KEY')) {
+      return NextResponse.json(
+        { 
+          error: 'Payment system is not configured. Please contact support.',
+          code: 'STRIPE_NOT_CONFIGURED'
+        },
+        { status: 500 }
+      )
+    }
+    
     return NextResponse.json(
       { error: error.message || 'Failed to create checkout session' },
       { status: 500 }

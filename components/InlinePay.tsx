@@ -42,7 +42,10 @@ export default function InlinePay({ amount, monthly, coffeeType, onSuccess, onCa
         const data = await response.json()
 
         if (!response.ok || data.error) {
-          setError(data.error || 'Failed to initialize payment')
+          const errorMessage = data.code === 'STRIPE_NOT_CONFIGURED'
+            ? 'Payment system is temporarily unavailable. Please try again later or contact support.'
+            : data.error || 'Failed to initialize payment'
+          setError(errorMessage)
           setLoading(false)
           return
         }

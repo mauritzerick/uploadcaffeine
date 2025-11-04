@@ -70,7 +70,10 @@ export default function CoffeeOptions() {
         
         if (!response.ok || data.error) {
           console.error('API Error:', data.error || 'Unknown error')
-          alert(`Error: ${data.error || 'Something went wrong. Please try again.'}`)
+          const errorMessage = data.code === 'STRIPE_NOT_CONFIGURED' 
+            ? 'Payment system is temporarily unavailable. Please try again later or contact support.'
+            : data.error || 'Something went wrong. Please try again.'
+          alert(`Error: ${errorMessage}`)
           setLoading(false)
           return
         }

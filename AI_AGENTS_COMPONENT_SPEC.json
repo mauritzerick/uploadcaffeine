@@ -1,0 +1,383 @@
+{
+  "component_name": "AI Agents System",
+  "version": "1.0.0",
+  "description": "Interactive draggable AI assistant components with three modes: drag, click (jokes/quotes), and mouse following. Features three unique agents: Coffee Assistant, CPU Assistant, and Stoic Agent.",
+  "repository": "uploadcaffeine.com",
+  
+  "overview": {
+    "summary": "A set of three interactive floating AI agent components that provide entertainment, wisdom, and engagement through draggable interfaces, click interactions, and smooth animations.",
+    "use_cases": [
+      "Website engagement and interactivity",
+      "User guidance to support/donation sections",
+      "Content delivery (jokes, quotes, wisdom)",
+      "Visual appeal and modern UI/UX",
+      "Easter egg features"
+    ]
+  },
+
+  "components": [
+    {
+      "name": "AmbientAgent",
+      "file": "components/AmbientAgent.tsx",
+      "variants": ["cpu", "coffee"],
+      "description": "Interactive floating agent with jokes and click interactions",
+      "props": {
+        "icon": {
+          "type": "'cpu' | 'coffee'",
+          "default": "'cpu'",
+          "description": "Icon type determines agent appearance and jokes"
+        },
+        "initialPosition": {
+          "type": "{ x: number; y: number }",
+          "optional": true,
+          "description": "Initial position on screen (defaults to bottom-right)"
+        }
+      }
+    },
+    {
+      "name": "StoicAgent",
+      "file": "components/StoicAgent.tsx",
+      "description": "Wisdom-focused agent displaying random Stoic quotes",
+      "props": {
+        "initialPosition": {
+          "type": "{ x: number; y: number }",
+          "optional": true,
+          "description": "Initial position on screen (defaults to center-bottom)"
+        }
+      }
+    }
+  ],
+
+  "features": {
+    "interaction_modes": [
+      {
+        "mode": "Drag",
+        "description": "Click and hold to drag anywhere on screen",
+        "implementation": "Framer Motion drag API with constraints",
+        "visual_feedback": "Scale increases, glow intensifies, cursor changes to grabbing"
+      },
+      {
+        "mode": "Click",
+        "description": "Click to show jokes/quotes, limited to 3 clicks before redirect",
+        "implementation": "onClick handler with state management",
+        "behavior": "After 3 clicks, shows 'out of energy' message and auto-scrolls to support section"
+      },
+      {
+        "mode": "Mouse Follow",
+        "description": "Subtly tracks mouse cursor with 5% sensitivity",
+        "implementation": "useMotionValue + useSpring from Framer Motion",
+        "disabled_when": "While dragging"
+      }
+    ],
+    "animations": [
+      "Floating (gentle up/down bob)",
+      "Rotation (icon rotates continuously)",
+      "Pulse border (expanding ring effect)",
+      "Glow intensity (varies with hover/drag state)",
+      "Orbiting particles (sparkles rotate around agent)",
+      "Popup animations (spring-based entrance/exit)"
+    ],
+    "responsiveness": {
+      "mobile": "Adapts positioning and popup widths",
+      "tablet": "Adjusted spacing and sizes",
+      "desktop": "Full feature set with optimal positioning"
+    }
+  },
+
+  "dependencies": {
+    "required": [
+      {
+        "package": "framer-motion",
+        "version": "latest",
+        "usage": ["motion.div", "useMotionValue", "useSpring", "AnimatePresence"]
+      },
+      {
+        "package": "lucide-react",
+        "version": "latest",
+        "icons_used": ["Cpu", "Coffee", "BookOpen", "Sparkles"]
+      },
+      {
+        "package": "react",
+        "version": "18+",
+        "hooks_used": ["useState", "useEffect"]
+      }
+    ],
+    "optional": [
+      {
+        "package": "tailwindcss",
+        "usage": "Styling (can be adapted to other CSS solutions)"
+      }
+    ]
+  },
+
+  "agent_specifications": {
+    "coffee_assistant": {
+      "icon": "Coffee",
+      "color_scheme": {
+        "gradient": "from-cyan-500 to-amber-600",
+        "glow": "rgba(0, 255, 255, 0.6)",
+        "tooltip_color": "cyan-400"
+      },
+      "jokes": [
+        "☕ Debugging? More like De-coffee-ing!",
+        "💻 Java: The only language I drink AND code in",
+        "🔥 I like my code like my coffee: Strong and keeping me up at night"
+      ],
+      "out_of_energy": "☕ Oops! Coffee tank empty... Buy us a refill? 💸✨",
+      "tooltip": "Coffee Assistant"
+    },
+    "cpu_assistant": {
+      "icon": "Cpu",
+      "color_scheme": {
+        "gradient": "from-cyan-500 to-purple-600",
+        "glow": "rgba(0, 255, 255, 0.6)",
+        "tooltip_color": "cyan-400"
+      },
+      "jokes": [
+        "🤖 Error 404: Coffee not found. Installing caffeine.exe...",
+        "💭 I asked my AI for a joke. It said: 'Your code.'",
+        "⚡ Why did the AI cross the road? To optimize the other side!"
+      ],
+      "out_of_energy": "🔋 System.out.println('Battery Low!'); Need coffee to recharge! ☕",
+      "tooltip": "AI Assistant Active"
+    },
+    "stoic_agent": {
+      "icon": "BookOpen",
+      "color_scheme": {
+        "gradient": "from-amber-600 via-yellow-700 to-amber-900",
+        "glow": "rgba(218, 165, 32, 0.6)",
+        "tooltip_color": "amber-400",
+        "font": "serif (for classical aesthetic)"
+      },
+      "quotes_source": "24 quotes from Marcus Aurelius, Seneca, and Epictetus",
+      "quotes_structure": {
+        "interface": "StoicQuote",
+        "fields": ["text", "author", "emoji"],
+        "function": "getRandomStoicQuote()",
+        "formatting": "formatStoicQuote()"
+      },
+      "out_of_wisdom": "📜 Ancient wisdom depleted! Support us to unlock more stoic insights... ☕✨",
+      "tooltip": "📖 Stoic Wisdom",
+      "animation_speed": "Slower (6s rotation, 4s float) for contemplative feel"
+    }
+  },
+
+  "data_structure": {
+    "stoic_quotes": {
+      "file": "lib/stoicQuotes.ts",
+      "interface": {
+        "name": "StoicQuote",
+        "fields": {
+          "text": "string - The quote text",
+          "author": "'Marcus Aurelius' | 'Seneca' | 'Epictetus'",
+          "emoji": "string - Emoji representing the quote"
+        }
+      },
+      "total_count": 24,
+      "distribution": {
+        "Marcus Aurelius": 8,
+        "Seneca": 8,
+        "Epictetus": 8
+      },
+      "functions": [
+        "getRandomStoicQuote(): StoicQuote",
+        "formatStoicQuote(quote: StoicQuote): string",
+        "getRandomStoicQuotes(count: number): StoicQuote[]",
+        "getQuotesByAuthor(author: string): StoicQuote[]"
+      ]
+    }
+  },
+
+  "implementation_details": {
+    "drag_system": {
+      "library": "Framer Motion",
+      "props": {
+        "drag": true,
+        "dragMomentum": false,
+        "dragElastic": 0.1,
+        "dragConstraints": "Window bounds minus agent size"
+      },
+      "callbacks": ["onDragStart", "onDragEnd"]
+    },
+    "mouse_following": {
+      "implementation": "useMotionValue + useSpring",
+      "sensitivity": "5% (0.05 multiplier)",
+      "spring_config": {
+        "damping": 20,
+        "stiffness": 150
+      },
+      "calculation": "(mousePosition - screenCenter) * 0.05"
+    },
+    "click_system": {
+      "max_clicks": 3,
+      "behavior": {
+        "clicks_1_3": "Show joke/quote",
+        "click_4": "Show 'out of energy' message, auto-scroll to support section after delay"
+      },
+      "popup_duration": {
+        "jokes": "3000ms",
+        "quotes": "5000ms"
+      }
+    },
+    "animations": {
+      "floating": {
+        "duration": "3-4 seconds",
+        "movement": "[0, -10, 0] pixels",
+        "rotation": "[0, 5, -5, 0] degrees (or [0, 3, -3, 0] for Stoic)"
+      },
+      "icon_rotation": {
+        "duration": "4 seconds (6s for Stoic)",
+        "ease": "linear",
+        "continuous": true
+      },
+      "pulse_border": {
+        "duration": "2-2.5 seconds",
+        "effect": "scale [1, 1.5, 1], opacity [1, 0, 0]"
+      },
+      "orbiting_particles": {
+        "count": "3 for AmbientAgent, 4 for StoicAgent",
+        "speed": "5-6 seconds per rotation",
+        "distance": "28-30px from center"
+      },
+      "glow_ring": {
+        "size": "120px",
+        "blur": "15px",
+        "pulse": "scale [1, 1.2-1.5, 1], opacity [0.3, 0.6, 0.3]"
+      }
+    },
+    "popup_system": {
+      "position": "Above agent (bottom-full)",
+      "max_width": "64-96 units (responsive)",
+      "animation": "Spring (stiffness: 300, damping: 20)",
+      "arrow": "CSS triangle pointing to agent",
+      "content": "Centered text with break-words"
+    }
+  },
+
+  "styling": {
+    "base_classes": [
+      "fixed z-50 cursor-grab active:cursor-grabbing",
+      "w-12 h-12 (48px)",
+      "rounded-full",
+      "flex items-center justify-center"
+    ],
+    "color_schemes": {
+      "coffee": {
+        "gradient": "bg-gradient-to-br from-cyan-500 to-amber-600",
+        "glow": "rgba(0, 255, 255, 0.6)",
+        "border": "border-cyan-400",
+        "text": "text-cyan-400"
+      },
+      "cpu": {
+        "gradient": "bg-gradient-to-br from-cyan-500 to-purple-600",
+        "glow": "rgba(0, 255, 255, 0.6)",
+        "border": "border-cyan-400",
+        "text": "text-cyan-400"
+      },
+      "stoic": {
+        "gradient": "bg-gradient-to-br from-amber-600 via-yellow-700 to-amber-900",
+        "glow": "rgba(218, 165, 32, 0.6)",
+        "border": "border-amber-400",
+        "text": "text-amber-400",
+        "font": "font-serif"
+      }
+    },
+    "popup_styling": {
+      "background": "bg-gradient-to-br from-gray-900 to-gray-800",
+      "border": "border-2 border-cyan-500 (or amber-500 for Stoic)",
+      "border_radius": "rounded-xl",
+      "padding": "px-4 py-3",
+      "shadow": "shadow-2xl with colored glow",
+      "text": "text-xs sm:text-sm font-mono (or font-serif for Stoic)"
+    }
+  },
+
+  "usage_example": {
+    "basic": {
+      "code": "import AmbientAgent from '@/components/AmbientAgent'\nimport StoicAgent from '@/components/StoicAgent'\n\n// In your component:\n<AmbientAgent icon=\"coffee\" />\n<AmbientAgent icon=\"cpu\" />\n<StoicAgent />"
+    },
+    "with_positioning": {
+      "code": "// Responsive positioning example\n<AmbientAgent \n  icon=\"coffee\" \n  initialPosition={{ \n    x: window.innerWidth < 768 ? 20 : 300, \n    y: window.innerHeight / 2 \n  }} \n/>"
+    },
+    "conditional_rendering": {
+      "code": "{isEnabled('ai_agents') && (\n  <>\n    <AmbientAgent icon=\"coffee\" />\n    <AmbientAgent icon=\"cpu\" />\n    <StoicAgent />\n  </>\n)}"
+    }
+  },
+
+  "customization_options": {
+    "colors": "Modify gradient and glow colors in iconColor object",
+    "jokes": "Update jokes array in component file",
+    "quotes": "Add/modify quotes in stoicQuotesData array",
+    "click_limit": "Change clickCount < 3 to desired number",
+    "popup_duration": "Modify setTimeout duration (3000ms or 5000ms)",
+    "animation_speed": "Adjust transition durations",
+    "mouse_sensitivity": "Change 0.05 multiplier",
+    "particle_count": "Modify array length in orbiting particles map",
+    "scroll_target": "Change '#coffee' selector to your target"
+  },
+
+  "accessibility": {
+    "keyboard_navigation": "Not implemented (can be added)",
+    "screen_readers": "Tooltips and popups have text content",
+    "reduced_motion": "Not explicitly handled (can respect prefers-reduced-motion)",
+    "focus_management": "Not implemented (can be added)"
+  },
+
+  "performance": {
+    "optimizations": [
+      "Lazy initialization with mounted state",
+      "Event listeners cleaned up in useEffect",
+      "Conditional rendering based on feature flags",
+      "Memoization opportunities for heavy computations"
+    ],
+    "bundle_size": "~15-20KB per component (with Framer Motion)",
+    "rendering": "Fixed position, minimal re-renders"
+  },
+
+  "integration": {
+    "feature_flags": {
+      "key": "ai_agents",
+      "purpose": "Enable/disable all agents at once"
+    },
+    "dependencies": "Requires feature flag context (optional)",
+    "scroll_target": "Expects #coffee section (or custom selector)",
+    "z_index": "z-50 (adjust if needed)"
+  },
+
+  "file_structure": {
+    "components": [
+      "components/AmbientAgent.tsx",
+      "components/StoicAgent.tsx"
+    ],
+    "data": [
+      "lib/stoicQuotes.ts"
+    ],
+    "usage": [
+      "app/page.tsx (example integration)"
+    ]
+  },
+
+  "notes": {
+    "implementation_tips": [
+      "Use Framer Motion for smooth animations",
+      "Implement proper cleanup for event listeners",
+      "Handle window resize for responsive positioning",
+      "Consider mobile touch events for better drag experience",
+      "Add loading states if initializing from external data"
+    ],
+    "common_issues": [
+      "z-index conflicts with other fixed elements",
+      "Drag constraints may need adjustment for different screen sizes",
+      "Popup positioning on mobile may need refinement",
+      "Event listener memory leaks if not cleaned up"
+    ],
+    "extensions": [
+      "Add more agent types (music, design, etc.)",
+      "Implement analytics tracking",
+      "Add sound effects on interactions",
+      "Create admin panel for managing jokes/quotes",
+      "Add keyboard shortcuts for agent controls"
+    ]
+  }
+}
+
