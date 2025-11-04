@@ -89,21 +89,34 @@ function isBuildContext(): boolean {
     return false
   }
   
-  // Check various indicators that we're in a build phase
-  const isBuild = (
-    process.env.NEXT_PHASE === 'phase-production-build' ||
-    process.env.NEXT_PHASE === 'phase-export' ||
-    process.env.NEXT_PHASE === 'phase-development-build'
-  )
-  
-  // Only return true if we're definitely in build AND not in a request handler
-  // During actual requests, VERCEL_ENV will be set
-  if (isBuild && process.env.VERCEL === '1' && !process.env.VERCEL_ENV) {
+  // PRIMARY CHECK: NEXT_PHASE is the most reliable indicator
+  // This is set by Next.js during build phase only
+  const nextPhase = process.env.NEXT_PHASE
+  if (nextPhase === 'phase-production-build' || 
+      nextPhase === 'phase-export' || 
+      nextPhase === 'phase-development-build') {
     return true
   }
   
-  // Don't use process.argv check as it might be set during runtime too
-  return isBuild
+  // SECONDARY CHECK: Only if we're in Vercel build (not runtime)
+  // During runtime requests, VERCEL_ENV will be 'production', 'preview', or 'development'
+  // During build, VERCEL_ENV might not be set, but we should be more careful
+  if (process.env.VERCEL === '1') {
+    // If VERCEL_ENV is explicitly set, we're in runtime
+    if (process.env.VERCEL_ENV) {
+      return false
+    }
+    // If NEXT_PHASE is set, we're definitely in build
+    if (nextPhase) {
+      return true
+    }
+    // Otherwise, be conservative - don't assume build
+    return false
+  }
+  
+  // Not in Vercel, check if we're running build command
+  // But only if we're definitely in build phase
+  return false
 }
 
 // Create a safe proxy that defers initialization until runtime
@@ -139,17 +152,24 @@ function createDeferredProxy(): PrismaClient {
 
 // Fully lazy initialization - only create when a method is actually called
 function getPrismaInstance(): PrismaClient {
-  if (prismaGlobal) {
-    return prismaGlobal
-  }
-
   const url = process.env.DATABASE_URL
   const isBuild = isBuildContext()
 
   // CRITICAL: During build, NEVER try to initialize Prisma
   // Even if DATABASE_AUTH_TOKEN is set, we don't want to connect during build
   if (isBuild) {
+    // Don't cache deferred proxy - always return fresh one during build
     return createDeferredProxy()
+  }
+
+  // At runtime, check if we have a cached real client (not deferred proxy)
+  if (prismaGlobal) {
+    // Verify it's a real client by checking for a Prisma model
+    if ('supporter' in prismaGlobal || '$connect' in prismaGlobal) {
+      return prismaGlobal
+    }
+    // If it's a deferred proxy, clear it and initialize fresh
+    prismaGlobal = undefined
   }
 
   // At runtime, if using libsql and missing token, return a deferred proxy with helpful error
@@ -178,32 +198,53 @@ const prisma = new Proxy({} as PrismaClient, {
     try {
       const instance = getPrismaInstance()
       
-      // If instance is a deferred proxy, let it handle the property access
-      // Check if it's our deferred proxy by seeing if it has a special marker
-      if (instance && typeof instance === 'object' && !('$connect' in instance || 'supporter' in instance)) {
-        // Might be deferred proxy, try to get the property
-        const value = (instance as any)[prop]
-        if (value !== undefined) {
-          return value
-        }
-      }
-      
       // Get the actual value from the instance
       const value = (instance as any)[prop]
+      
+      // If value is undefined, return undefined
       if (value === undefined || value === null) {
         return undefined
       }
       
-      // For Prisma models (objects with methods like findMany, aggregate, etc.)
-      // Return them directly - Prisma models already have their methods properly bound
-      if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      // CRITICAL: Prisma models are objects with methods already bound
+      // We must return them directly without any modification
+      // Prisma models like prisma.supporter have methods like findMany, findFirst, etc.
+      if (typeof value === 'object' && value !== null) {
+        // Don't modify Date objects or arrays
+        if (value instanceof Date || Array.isArray(value)) {
+          return value
+        }
+        
+        // For Prisma model delegates, they have methods like findMany, findFirst, create, aggregate, etc.
+        // These are already properly bound by Prisma, so return them as-is
+        // Check if it has Prisma model methods (not just any object)
+        const hasPrismaMethods = typeof (value as any).findMany === 'function' ||
+                                  typeof (value as any).findFirst === 'function' ||
+                                  typeof (value as any).create === 'function' ||
+                                  typeof (value as any).aggregate === 'function' ||
+                                  typeof (value as any).count === 'function' ||
+                                  typeof (value as any).update === 'function' ||
+                                  typeof (value as any).delete === 'function'
+        
+        if (hasPrismaMethods) {
+          // This is a Prisma model delegate - return it directly
+          return value
+        }
+        
+        // For other objects, return as-is
         return value
       }
       
       // For functions, bind them to the instance
-      return typeof value === 'function' ? value.bind(instance) : value
+      if (typeof value === 'function') {
+        return value.bind(instance)
+      }
+      
+      // For primitives, return as-is
+      return value
     } catch (e: any) {
-      // If we can't get the instance, return a function that throws
+      // If we can't get the instance, log the error and return a function that throws
+      console.error('Prisma proxy error:', e.message)
       return () => {
         throw new Error(`Cannot access Prisma client: ${e.message}`)
       }
