@@ -11,6 +11,28 @@ export async function GET() {
   // Allow in production for debugging (remove restriction)
   // In production, you might want to add basic auth or rate limiting
 
+  // Check if DATABASE_URL is configured
+  if (!process.env.DATABASE_URL) {
+    return NextResponse.json({
+      error: 'DATABASE_URL is not configured',
+      message: 'Database environment variable is missing in Vercel',
+      fix: {
+        step1: 'Go to Vercel Dashboard → Settings → Environment Variables',
+        step2: 'Add: DATABASE_URL=file:/tmp/prod.db (temporary SQLite)',
+        step3: 'OR use a cloud database: DATABASE_URL=libsql://... (Turso - recommended)',
+        step4: 'Redeploy your project',
+        note: 'SQLite on Vercel loses data on redeploy. Use Turso or Neon for production.',
+        turso: 'https://turso.tech (SQLite-compatible, free tier)',
+        neon: 'https://neon.tech (PostgreSQL, free tier)',
+      },
+      currentEnv: {
+        nodeEnv: process.env.NODE_ENV,
+        hasDatabaseUrl: !!process.env.DATABASE_URL,
+        vercel: !!process.env.VERCEL,
+      },
+    }, { status: 500 })
+  }
+
   try {
     // Get all supporters
     const allSupporters = await prisma.supporter.findMany({
@@ -76,8 +98,27 @@ export async function GET() {
       note: 'If isCurrentMonth is false, the payment won\'t appear in monthly goal (by design - monthly goal only counts current month)',
     })
   } catch (error: any) {
+    // Check if it's a Prisma initialization error (DATABASE_URL missing)
+    if (error.message?.includes('DATABASE_URL') || error.message?.includes('Environment variable not found')) {
+      return NextResponse.json({
+        error: 'Database configuration error',
+        message: error.message,
+        fix: {
+          step1: 'Go to Vercel Dashboard → Settings → Environment Variables',
+          step2: 'Add: DATABASE_URL=file:/tmp/prod.db (temporary)',
+          step3: 'OR use Turso: DATABASE_URL=libsql://your-db.turso.io?authToken=...',
+          step4: 'Redeploy your project',
+          recommended: 'Use Turso (https://turso.tech) for persistent SQLite database',
+        },
+      }, { status: 500 })
+    }
+
     return NextResponse.json(
-      { error: error.message, stack: error.stack },
+      { 
+        error: error.message, 
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+        type: error.constructor.name,
+      },
       { status: 500 }
     )
   }

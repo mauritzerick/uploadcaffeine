@@ -17,6 +17,8 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@libsql/client": "^0.15.15",
+    "@prisma/adapter-libsql": "^6.18.0",
     "@prisma/client": "^5.7.1",
     "@stripe/react-stripe-js": "^2.4.0",
     "@stripe/stripe-js": "^2.4.0",
