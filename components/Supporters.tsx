@@ -7,13 +7,24 @@ import useSWR from 'swr'
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 export default function Supporters() {
-  const { data, error } = useSWR('/api/stats', fetcher, {
+  const { data, error, isLoading } = useSWR('/api/stats', fetcher, {
     refreshInterval: 30000, // Refresh every 30 seconds
   })
 
-  if (error) {
-    // Fallback to static display
+  // Show loading skeleton only while loading, not on error
+  if (isLoading && !data) {
     return <SupportersSkeleton />
+  }
+
+  if (error) {
+    // Show empty state instead of skeleton on error
+    return (
+      <section id="supporters" className="relative py-20 px-4 bg-gradient-to-br from-[#0a0a14] via-[#120a1f] to-[#0a0a14] overflow-hidden">
+        <div className="max-w-6xl mx-auto relative z-10 text-center">
+          <p className="text-cyan-400/70 text-sm">Supporters unavailable (database connection required)</p>
+        </div>
+      </section>
+    )
   }
 
   // Use real data only

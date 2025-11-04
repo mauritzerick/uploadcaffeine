@@ -18,6 +18,7 @@ import DeviceHologram from '@/components/DeviceHologram'
 import FeaturesMenu from '@/components/FeaturesMenu'
 import FlyingCoffeeMugs from '@/components/effects/FlyingCoffeeMugs'
 import QRCodeBanner from '@/components/QRCodeBanner'
+import GlitchAgent from '@/components/GlitchAgent'
 import { useFeatureFlagsContext } from '@/providers/FeatureFlagsProvider'
 import { useCoffeeMugEasterEgg } from '@/hooks/useCoffeeMugEasterEgg'
 
@@ -171,6 +172,9 @@ export default function Home() {
       
       {/* Terminal Console */}
       {isEnabled('terminal_console') && <TerminalConsole />}
+      
+      {/* Glitch Agent Button */}
+      <GlitchAgent />
       
       <Hero />
       

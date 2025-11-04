@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { FeatureFlagsProvider } from '@/providers/FeatureFlagsProvider'
-import GlitchAgent from '@/components/GlitchAgent'
 import { SITE } from '@/lib/seo.config'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap', preload: true })
@@ -85,7 +84,6 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} font-sans`}>
         <FeatureFlagsProvider>
-          <GlitchAgent />
           {children}
         </FeatureFlagsProvider>
       </body>

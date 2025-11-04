@@ -23,6 +23,8 @@ const DEFAULT_FLAGS: Record<string, boolean> = {
   ai_agents: true,
   particle_effects: true,
   neon_radio: true,
+  glitch_agent: true,
+  effect_glitch_cinematic: true,
 }
 
 export function useFeatureFlags() {

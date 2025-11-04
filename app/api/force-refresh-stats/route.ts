@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 export async function POST() {
   try {
     // Get monthly goal from env
-    const monthlyGoalCents = parseInt(process.env.NEXT_PUBLIC_MONTHLY_GOAL_CENTS || '15000')
+    const monthlyGoalCents = parseInt(process.env.NEXT_PUBLIC_MONTHLY_GOAL_CENTS || '15000', 10)
 
     // Get current month's supporters
     const now = new Date()

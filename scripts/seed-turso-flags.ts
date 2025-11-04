@@ -29,6 +29,12 @@ const defaultFlags = [
     enabled: true,
   },
   {
+    key: 'glitch_agent',
+    name: 'Glitch Agent Button',
+    description: 'Show the glitch agent button in top-right corner',
+    enabled: true,
+  },
+  {
     key: 'effect_glitch_cinematic',
     name: 'Glitch Effect',
     description: 'Press G to activate chaotic glitch effects',

@@ -18,12 +18,12 @@ const getPrismaClient = () => {
     const libsql = createClient({ 
       url: databaseUrl,
     })
-    const adapter = new PrismaLibSQL(libsql)
+    const adapter = new PrismaLibSQL(libsql as any)
     
     return new PrismaClient({
-      adapter,
+      adapter: adapter as any,
       log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-    })
+    } as any)
   }
   
   // Otherwise use default SQLite

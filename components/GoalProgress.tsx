@@ -51,7 +51,16 @@ export default function GoalProgress() {
     }
   }, [data, goal])
 
-  if (error) return null
+  // Show loading state or error state (but don't hide completely)
+  if (error) {
+    console.warn('GoalProgress API error:', error)
+    // Show a fallback UI instead of hiding completely
+    return (
+      <div className="w-full bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-8 border-2 border-cyan-500/30">
+        <p className="text-cyan-400/70 text-sm">Goal progress unavailable (database connection required)</p>
+      </div>
+    )
+  }
   if (!data) {
     return (
       <div className="w-full h-32 bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl animate-pulse" />
