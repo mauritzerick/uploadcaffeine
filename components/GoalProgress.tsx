@@ -2,14 +2,28 @@
 
 import { motion } from 'framer-motion'
 import { TrendingUp, Zap, DollarSign } from 'lucide-react'
-import useSWR from 'swr'
+import useSWR, { mutate } from 'swr'
+import { useEffect } from 'react'
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 export default function GoalProgress() {
   const { data, error } = useSWR('/api/stats', fetcher, {
-    refreshInterval: 30000, // Refresh every 30 seconds
+    refreshInterval: 30000, // Refresh every 30 seconds (fallback)
+    revalidateOnFocus: true, // Refresh when user returns to tab
+    revalidateOnReconnect: true, // Refresh when network reconnects
+    dedupingInterval: 5000, // Prevent duplicate requests within 5s
   })
+
+  // Listen for payment success events to refresh immediately
+  useEffect(() => {
+    const handlePaymentSuccess = () => {
+      mutate('/api/stats')
+    }
+    
+    window.addEventListener('payment-success', handlePaymentSuccess)
+    return () => window.removeEventListener('payment-success', handlePaymentSuccess)
+  }, [])
 
   if (error) return null
   if (!data) {

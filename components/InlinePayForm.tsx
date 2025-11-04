@@ -5,6 +5,7 @@ import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js'
 import { motion } from 'framer-motion'
 import { Zap, Coffee, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { trackEvent } from '@/lib/analytics'
+import { mutate } from 'swr'
 
 interface InlinePayFormProps {
   amount: number
@@ -52,6 +53,14 @@ export default function InlinePayForm({ amount, onSuccess, onCancel }: InlinePay
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
         setSuccess(true)
         trackEvent('checkout_success', { amount: amount / 100, method: 'inline' })
+        
+        // ✅ IMMEDIATE FIX: Refresh goal progress immediately
+        mutate('/api/stats')
+        
+        // Broadcast payment success event for other components
+        window.dispatchEvent(new CustomEvent('payment-success', {
+          detail: { amount: amount / 100 }
+        }))
         
         // Wait a bit to show success state, then trigger parent callback
         setTimeout(() => {
