@@ -98,24 +98,25 @@ function isBuildContext(): boolean {
     return true
   }
   
-  // SECONDARY CHECK: Only if we're in Vercel build (not runtime)
-  // During runtime requests, VERCEL_ENV will be 'production', 'preview', or 'development'
-  // During build, VERCEL_ENV might not be set, but we should be more careful
+  // CRITICAL: If we're in Vercel and VERCEL_ENV is set, we're in RUNTIME
+  // This is the most reliable runtime indicator
+  if (process.env.VERCEL === '1' && process.env.VERCEL_ENV) {
+    return false // We're in runtime, not build
+  }
+  
+  // If we're in Vercel but VERCEL_ENV is not set, we might be in build
+  // But only if NEXT_PHASE is explicitly set
+  if (process.env.VERCEL === '1' && nextPhase) {
+    return true
+  }
+  
+  // If we're in Vercel without VERCEL_ENV or NEXT_PHASE, assume runtime
+  // (This is safer - we'd rather initialize Prisma than return a deferred proxy)
   if (process.env.VERCEL === '1') {
-    // If VERCEL_ENV is explicitly set, we're in runtime
-    if (process.env.VERCEL_ENV) {
-      return false
-    }
-    // If NEXT_PHASE is set, we're definitely in build
-    if (nextPhase) {
-      return true
-    }
-    // Otherwise, be conservative - don't assume build
     return false
   }
   
-  // Not in Vercel, check if we're running build command
-  // But only if we're definitely in build phase
+  // Not in Vercel, only return true if NEXT_PHASE is explicitly set
   return false
 }
 
@@ -167,10 +168,15 @@ function getPrismaInstance(): PrismaClient {
   if (prismaGlobal) {
     // Verify it's a real client (not a deferred proxy)
     // Real Prisma clients have actual model properties with methods
-    const testModel = (prismaGlobal as any).supporter
-    if (testModel && typeof testModel.findMany === 'function') {
-      // This is a real Prisma client
-      return prismaGlobal
+    try {
+      const testModel = (prismaGlobal as any).supporter
+      if (testModel && typeof testModel.findMany === 'function') {
+        // This is a real Prisma client - use it
+        return prismaGlobal
+      }
+    } catch (e) {
+      // If accessing supporter throws, it's not a real client
+      console.warn('Prisma client cache invalid, clearing:', e)
     }
     // If it's a deferred proxy or invalid, clear it
     prismaGlobal = undefined
@@ -184,13 +190,29 @@ function getPrismaInstance(): PrismaClient {
 
   // At runtime, try to initialize with all required vars
   try {
+    console.log('🔧 Initializing Prisma client at runtime...', {
+      hasUrl: !!url,
+      hasToken: !!process.env.DATABASE_AUTH_TOKEN,
+      urlPrefix: url?.substring(0, 20),
+      isBuild: isBuild,
+      vercelEnv: process.env.VERCEL_ENV,
+      nextPhase: process.env.NEXT_PHASE,
+    })
+    
     const client = makeClient()
     
     // Verify the client was created correctly
     const testModel = (client as any).supporter
     if (!testModel || typeof testModel.findMany !== 'function') {
+      console.error('❌ Prisma client created but models are not accessible:', {
+        hasModel: !!testModel,
+        modelType: typeof testModel,
+        hasFindMany: typeof testModel?.findMany,
+      })
       throw new Error('Prisma client created but models are not accessible. Check adapter configuration.')
     }
+    
+    console.log('✅ Prisma client initialized successfully')
     
     // Cache the client
     prismaGlobal = client
@@ -200,6 +222,9 @@ function getPrismaInstance(): PrismaClient {
     return client
   } catch (e: any) {
     // If initialization fails, re-throw with helpful message
+    console.error('❌ Failed to initialize Prisma client:', e.message, {
+      stack: process.env.NODE_ENV === 'development' ? e.stack : undefined,
+    })
     throw new Error(`Failed to initialize Prisma client: ${e.message}. Check DATABASE_URL and DATABASE_AUTH_TOKEN.`)
   }
 }
