@@ -33,15 +33,27 @@ async function handleSeed() {
     }
 
     // Check if we're using libsql and need auth token
-    if (process.env.DATABASE_URL.startsWith('libsql://') && !process.env.DATABASE_AUTH_TOKEN) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'DATABASE_AUTH_TOKEN is required',
-          message: 'DATABASE_AUTH_TOKEN is required for libsql:// DATABASE_URL',
-        },
-        { status: 500 }
-      )
+    if (process.env.DATABASE_URL.startsWith('libsql://')) {
+      // Check for token in env var or URL
+      let hasToken = !!process.env.DATABASE_AUTH_TOKEN
+      if (!hasToken) {
+        try {
+          const urlObj = new URL(process.env.DATABASE_URL)
+          hasToken = urlObj.searchParams.has('authToken')
+        } catch {
+          // URL parsing failed, assume no token
+        }
+      }
+      if (!hasToken) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Auth token is required',
+            message: 'Auth token is required for libsql:// DATABASE_URL. Set DATABASE_AUTH_TOKEN env var or include ?authToken= in URL.',
+          },
+          { status: 500 }
+        )
+      }
     }
 
     // Check if initial supporter already exists

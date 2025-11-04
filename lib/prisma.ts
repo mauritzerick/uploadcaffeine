@@ -27,14 +27,40 @@ function makeClient(): PrismaClient {
     throw new Error('DATABASE_URL is not set')
   }
 
-  // libsql/turso path (requires DATABASE_AUTH_TOKEN)
-  // NOTE: This should never be called if DATABASE_AUTH_TOKEN is missing
-  // because getPrismaInstance() checks for it first
+  // libsql/turso path (requires auth token)
+  // Token can be in DATABASE_AUTH_TOKEN env var OR in the URL as ?authToken=...
   if (url.startsWith('libsql://')) {
-    const token = process.env.DATABASE_AUTH_TOKEN
+    // Try to get token from env var first
+    let token = process.env.DATABASE_AUTH_TOKEN
+    
+    // If not in env var, try to extract from URL query parameter
+    if (!token) {
+      try {
+        const urlObj = new URL(url)
+        token = urlObj.searchParams.get('authToken') || undefined
+      } catch {
+        // URL parsing failed, continue without token
+      }
+    }
+    
     if (!token) {
       // This should never happen, but add safety check
-      throw new Error('DATABASE_AUTH_TOKEN is required for libsql:// DATABASE_URL. This should have been caught earlier.')
+      throw new Error('Auth token is required for libsql:// DATABASE_URL. Set DATABASE_AUTH_TOKEN env var or include ?authToken= in URL.')
+    }
+    
+    // Clean the URL to remove authToken if it's in the query string
+    // (we'll pass it separately to createClient)
+    let cleanUrl = url
+    try {
+      const urlObj = new URL(url)
+      // Extract just the protocol, hostname, and pathname (no query params)
+      cleanUrl = `${urlObj.protocol}//${urlObj.hostname}${urlObj.pathname || ''}`
+    } catch {
+      // URL parsing failed, try to extract manually
+      const match = url.match(/^(libsql:\/\/[^?]+)/)
+      if (match) {
+        cleanUrl = match[1]
+      }
     }
     try {
       const { createClient, PrismaLibSQL } = loadLibSQL()
@@ -47,7 +73,7 @@ function makeClient(): PrismaClient {
         throw new Error('PrismaLibSQL from @prisma/adapter-libsql is not a function. Package may not be installed correctly.')
       }
       
-      const libsql = createClient({ url, authToken: token })
+      const libsql = createClient({ url: cleanUrl, authToken: token })
       
       // Validate libsql client was created
       if (!libsql || typeof libsql !== 'object') {
@@ -104,19 +130,30 @@ function isBuildContext(): boolean {
     return false // We're in runtime, not build
   }
   
+  // CRITICAL: If NEXT_PHASE is NOT set, we're definitely in runtime
+  // During build, Next.js ALWAYS sets NEXT_PHASE
+  if (!nextPhase) {
+    return false // No NEXT_PHASE means we're in runtime
+  }
+  
   // If we're in Vercel but VERCEL_ENV is not set, we might be in build
   // But only if NEXT_PHASE is explicitly set
   if (process.env.VERCEL === '1' && nextPhase) {
     return true
   }
   
-  // If we're in Vercel without VERCEL_ENV or NEXT_PHASE, assume runtime
-  // (This is safer - we'd rather initialize Prisma than return a deferred proxy)
+  // If we're in Vercel without VERCEL_ENV, assume runtime (safer)
+  // We'd rather initialize Prisma than return a deferred proxy
   if (process.env.VERCEL === '1') {
     return false
   }
   
-  // Not in Vercel, only return true if NEXT_PHASE is explicitly set
+  // Not in Vercel and NEXT_PHASE is set - we're in build
+  if (nextPhase) {
+    return true
+  }
+  
+  // Default to runtime (safer)
   return false
 }
 
@@ -184,8 +221,20 @@ function getPrismaInstance(): PrismaClient {
 
   // At runtime, if using libsql and missing token, throw helpful error
   // Don't return deferred proxy - we want a clear error at runtime
-  if (url?.startsWith('libsql://') && !process.env.DATABASE_AUTH_TOKEN) {
-    throw new Error('DATABASE_AUTH_TOKEN is required for libsql:// DATABASE_URL. Set it in Vercel environment variables.')
+  if (url?.startsWith('libsql://')) {
+    // Check for token in env var or URL
+    let hasToken = !!process.env.DATABASE_AUTH_TOKEN
+    if (!hasToken) {
+      try {
+        const urlObj = new URL(url)
+        hasToken = urlObj.searchParams.has('authToken')
+      } catch {
+        // URL parsing failed, assume no token
+      }
+    }
+    if (!hasToken) {
+      throw new Error('Auth token is required for libsql:// DATABASE_URL. Set DATABASE_AUTH_TOKEN env var or include ?authToken= in URL.')
+    }
   }
 
   // At runtime, try to initialize with all required vars
@@ -233,24 +282,66 @@ function getPrismaInstance(): PrismaClient {
 }
 
 // Export a proxy that only initializes when methods are called
-// SIMPLIFIED: Just return the value directly from the instance
+// CRITICAL FIX: At runtime, we MUST get the real Prisma client, not a deferred proxy
 const prisma = new Proxy({} as PrismaClient, {
   get(_target, prop) {
+    // Skip special properties that might cause issues
+    if (prop === 'then' || prop === 'catch' || prop === Symbol.toStringTag) {
+      return undefined
+    }
+    
     try {
       const instance = getPrismaInstance()
-      // Simply return the property from the instance - Prisma handles binding
-      return (instance as any)[prop]
+      
+      // CRITICAL: Verify we got a real client, not a deferred proxy
+      // Deferred proxies don't have real model properties
+      if (!instance || typeof instance !== 'object') {
+        throw new Error('getPrismaInstance returned invalid value')
+      }
+      
+      // Test that supporter model exists and has methods
+      const testSupporter = (instance as any).supporter
+      if (!testSupporter || typeof testSupporter.findMany !== 'function') {
+        // This is likely a deferred proxy - we shouldn't be here at runtime
+        console.error('❌ Prisma proxy: Got deferred proxy at runtime!', {
+          hasInstance: !!instance,
+          hasSupporter: !!testSupporter,
+          supporterType: typeof testSupporter,
+          vercelEnv: process.env.VERCEL_ENV,
+          nextPhase: process.env.NEXT_PHASE,
+        })
+        throw new Error('Prisma client not initialized - got deferred proxy at runtime. Check DATABASE_URL and DATABASE_AUTH_TOKEN.')
+      }
+      
+      // Get the property from the real instance
+      const value = (instance as any)[prop]
+      
+      // If value is undefined, return undefined (don't wrap it)
+      if (value === undefined || value === null) {
+        return value
+      }
+      
+      // Return the value directly - Prisma handles all binding
+      return value
     } catch (e: any) {
-      // If we can't get the instance, log the error
-      console.error('Prisma proxy error:', e.message, {
-        stack: process.env.NODE_ENV === 'development' ? e.stack : undefined,
+      // Log the error with context
+      console.error('❌ Prisma proxy get error:', {
+        prop: String(prop),
+        error: e.message,
+        hasUrl: !!process.env.DATABASE_URL,
+        hasToken: !!process.env.DATABASE_AUTH_TOKEN,
+        vercelEnv: process.env.VERCEL_ENV,
+        nextPhase: process.env.NEXT_PHASE,
       })
-      // Return a function that throws with helpful error
+      
+      // For model access, return a function that throws a helpful error
       if (typeof prop === 'string' && prop !== 'then' && prop !== 'catch') {
         return (...args: any[]) => {
-          throw new Error(`Cannot access Prisma client: ${e.message}. Check DATABASE_URL and DATABASE_AUTH_TOKEN.`)
+          throw new Error(`Cannot access Prisma client: ${e.message}. Check DATABASE_URL and DATABASE_AUTH_TOKEN in Vercel.`)
         }
       }
+      
+      // For other properties, throw directly
       throw e
     }
   },
