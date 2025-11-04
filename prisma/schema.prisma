@@ -11,6 +11,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Ensure model name exactly matches generated delegate 'supporter' (lowercase in client)
 model Supporter {
   id          String   @id @default(cuid())
   name        String?
