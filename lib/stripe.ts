@@ -36,9 +36,17 @@ function getStripe(): Stripe {
 // Export a getter that initializes on first use
 export const stripe = new Proxy({} as Stripe, {
   get(target, prop) {
-    const instance = getStripe()
-    const value = instance[prop as keyof Stripe]
-    return typeof value === 'function' ? value.bind(instance) : value
+    try {
+      const instance = getStripe()
+      const value = instance[prop as keyof Stripe]
+      return typeof value === 'function' ? value.bind(instance) : value
+    } catch (error: any) {
+      // Re-throw with more context
+      if (error.message?.includes('STRIPE_SECRET_KEY')) {
+        throw error // This will be caught by the API route
+      }
+      throw error
+    }
   }
 })
 
