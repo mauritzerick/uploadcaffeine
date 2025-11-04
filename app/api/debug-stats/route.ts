@@ -42,10 +42,11 @@ export async function GET() {
     })
 
     // Get current month's supporters
+    // Use UTC to avoid timezone issues - database stores dates in UTC
     const now = new Date()
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-    const currentMonth = now.getMonth()
-    const currentYear = now.getFullYear()
+    const startOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0))
+    const currentMonth = now.getUTCMonth()
+    const currentYear = now.getUTCFullYear()
     
     const monthlySupport = await prisma.supporter.aggregate({
       where: {

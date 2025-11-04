@@ -74,6 +74,8 @@ export async function GET() {
       oneTimeTotal,
       subscriptionTotal,
       totalSupporters,
+      startOfMonth: startOfMonth.toISOString(),
+      now: now.toISOString(),
     })
 
     return NextResponse.json({

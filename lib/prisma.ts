@@ -44,33 +44,43 @@ function getPrisma(): PrismaClient {
   }
   
   const client = getPrismaClient()
-  if (process.env.NODE_ENV !== 'production') {
-    globalForPrisma.prisma = client
-  }
+  // Cache in both dev and production to prevent multiple instances
+  globalForPrisma.prisma = client
   return client
 }
 
 // Export a proxy that only initializes when accessed
 export const prisma = new Proxy({} as PrismaClient, {
   get(target, prop) {
-    const client = getPrisma()
-    if (!client) {
-      throw new Error('Prisma client failed to initialize. Check DATABASE_URL.')
+    try {
+      const client = getPrisma()
+      if (!client) {
+        throw new Error('Prisma client failed to initialize. Check DATABASE_URL.')
+      }
+      
+      const value = (client as any)[prop]
+      
+      // Handle undefined/null values
+      if (value === undefined || value === null) {
+        return undefined
+      }
+      
+      // Bind functions directly to the client instance
+      if (typeof value === 'function') {
+        return value.bind(client)
+      }
+      
+      // For Prisma models (objects with methods like findMany, aggregate, etc.)
+      // Return the model directly - Prisma models already have their methods bound correctly
+      if (typeof value === 'object' && value !== null) {
+        return value
+      }
+      
+      return value
+    } catch (error: any) {
+      // If initialization fails, provide helpful error
+      throw new Error(`Prisma client error: ${error.message}. Make sure DATABASE_URL is set correctly.`)
     }
-    
-    const value = (client as any)[prop]
-    
-    // Handle undefined/null values
-    if (value === undefined || value === null) {
-      return undefined
-    }
-    
-    // Bind functions to the client instance
-    if (typeof value === 'function') {
-      return value.bind(client)
-    }
-    
-    return value
   },
   has(target, prop) {
     try {
